@@ -7,6 +7,7 @@ description: Writes commit messages and pull request titles for the Wavi reposit
 
 Follow [Conventional Commits](https://www.conventionalcommits.org/ja/v1.0.0/). The types decide releases: `scripts/next-version.sh` reads them on every push to `main`, so a wrong type ships a release nobody needed or skips one users were waiting for. These rules are specific to this repo:
 
+- Only commits that change `app/` (the macOS app) version it. A `feat:` or `fix:` that touches only `web/` or `scripts/` releases nothing, so keep app changes and website changes in separate commits; the types still describe what changed for that part.
 - `security:` is a type here and bumps patch, like `fix:`.
 - `release:` is a type here and bumps major on purpose (e.g. 0.x → 1.0.0). Use it only when the user decides to; never pick it yourself.
 - Breaking changes (`!` or a `BREAKING CHANGE:` footer) bump major even in 0.x. Don't use `break:`; it isn't recognised.

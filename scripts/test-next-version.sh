@@ -5,7 +5,11 @@ NV="$(cd "$(dirname "$0")" && pwd)/next-version.sh"
 cd "$(mktemp -d)"
 git init -q && git config user.email t@t && git config user.name t
 fails=0
-c() { git commit -q --allow-empty -m "$1"; }
+# c MESSAGE [DIR]: commits a change under DIR (default app, the macOS app).
+c() {
+    mkdir -p "${2:-app}" && echo "$RANDOM$RANDOM" >>"${2:-app}/file"
+    git add -A && git commit -q -m "$1"
+}
 check() {
     got=$("$NV")
     if [[ "$got" == "$2" ]]; then echo "ok   $1 -> '$got'"; else echo "FAIL $1 -> got '$got' want '$2'"; fails=1; fi
@@ -48,4 +52,13 @@ release                               # v3.0.0
 c "feature: not a type"; c "Fix: capitalized"; c "fix:no space"; c "break: other prefix"; c "releases: typo"
                                       check "near misses do not count" ""
 git tag v3.0.1-beta; c "fix: k";      check "pre-release tag is not the base" "3.0.1"
+release                               # v3.0.1
+
+# Only commits that change app/ version the app.
+c "feat: a website page" web; c "fix: a website bug" web; c "feat: a release script" scripts
+                                      check "web/ and scripts/ only" ""
+c "fix: the app" app;                 check "app/ among others" "3.0.2"
+echo "$RANDOM" >>web/file; c "feat: one commit changing app/ and web/" app
+                                      check "a commit touching app/ and web/ counts" "3.1.0"
+cd app && check "runs from a subfolder" "3.1.0" && cd ..
 exit $fails

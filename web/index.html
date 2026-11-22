@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Wavi — エディタを立ち上げるほどでもない時に。</title>
+    <meta name="description" content="落としたファイルも、貼ったログも。開いた瞬間に、サイズと中身がわかる。macOS のテキストビューア。">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <!-- Gen Jyuu Gothic Monospace isn't served on the web, so M PLUS Rounded 1c stands in for Japanese in the mono stack (SPEC 4, 8). -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;700&family=JetBrains+Mono:wght@400;500;700&family=Noto+Sans+JP:wght@400;500&display=swap">
+    <link rel="stylesheet" href="style.css">
+  </head>
+  <body>
+    <!-- Follows the adopted design's "ホームページ（左寄せ）" and SPEC 8: these sections only, in this order. -->
+    <header class="header">
+      <a class="logo" href="#top">
+        <svg width="32" height="32" viewBox="0 0 100 100" aria-hidden="true">
+          <defs>
+            <linearGradient id="logo-bg" gradientUnits="userSpaceOnUse" x1="35" y1="10" x2="65" y2="90"><stop offset="0" stop-color="#FFFFFF"/><stop offset="1" stop-color="#E4E8ED"/></linearGradient>
+            <linearGradient id="logo-body" x1="0" y1="1" x2="1" y2="0"><stop offset="0" stop-color="#DCDFE3"/><stop offset="1" stop-color="#ACB2BA"/></linearGradient>
+          </defs>
+          <rect x="6" y="6" width="88" height="88" rx="20" fill="url(#logo-bg)" stroke="#000000" stroke-opacity="0.1" stroke-width="1.2"/>
+          <path d="M24 74 V51 C24 42 28.5 37.5 34 37.5 C39.5 37.5 40.5 44 46 44 C51.5 44 52.5 35 59 35 C65.5 35 67.5 41.5 72 41.5 C75 41.5 76 45 76 51 V74 C76 76.8 73.8 79 71 79 H29 C26.2 79 24 76.8 24 74 Z" fill="url(#logo-body)"/>
+          <circle cx="41" cy="58" r="4.4" fill="url(#logo-bg)"/>
+          <circle cx="59" cy="58" r="4.4" fill="url(#logo-bg)"/>
+        </svg>
+        <span>Wavi</span>
+      </a>
+      <a class="header-link" href="https://github.com/hrkmtsmt/wavi">GitHub</a>
+    </header>
+
+    <main>
+      <section id="top" class="hero">
+        <h1>エディタを立ち上げる<br>ほどでもない時に。</h1>
+        <p>落としたファイルも、貼ったログも。<br>開いた瞬間に、サイズと中身がわかる。</p>
+        <!-- Always the latest release's Wavi.zip; release.yml attaches it under this name every time. -->
+        <a class="download" href="https://github.com/hrkmtsmt/wavi/releases/latest/download/Wavi.zip">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11"/><path d="M7.5 10.5L12 15l4.5-4.5"/><path d="M5 19h14"/></svg>
+          無料でダウンロード
+        </a>
+      </section>
+
+      <!-- A still for now; SPEC 8 swaps it for a short screen recording of the real app later. -->
+      <section class="showcase-wrap">
+        <div class="showcase" role="img" aria-label="Finder のダウンロードフォルダから webhook-event.json をドラッグし、Wavi のウィンドウに重ねている場面。Wavi のウィンドウ全体が薄い青になり、タブの位置に開く予定のファイル名とサイズ、1行目に「離すと開きます」とだけ表示されている">
+          <div class="finder" aria-hidden="true">
+            <div class="finder-bar">
+              <span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span>
+              <span class="finder-title">ダウンロード</span>
+            </div>
+            <div class="finder-body">
+              <div class="finder-side">
+                <span>最近の項目</span>
+                <span class="selected">ダウンロード</span>
+                <span>書類</span>
+                <span>デスクトップ</span>
+              </div>
+              <div class="finder-files">
+                <div class="picked"><span>webhook-event.json</span><span>18.6 KB</span></div>
+                <div><span>memo.md</span><span>412 B</span></div>
+                <div><span>server.pem</span><span>1.2 KB</span></div>
+                <div><span>export.csv</span><span>86 KB</span></div>
+                <div><span>build.log</span><span>2.4 MB</span></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="wavi" aria-hidden="true">
+            <div class="wavi-lights"><span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span></div>
+            <div class="wavi-tabs">
+              <span class="glass-track"><span class="preview-tab">webhook-event.json<b>18.6 KB</b></span></span>
+              <span class="glass-round"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span>
+            </div>
+            <div class="wavi-release"><b>離すと開きます</b></div>
+            <div class="wavi-status">
+              <span class="status-pill"><span class="muted">TEXT</span><b class="size">0 B</b><span class="muted">0 行</span><span class="muted">UTF-8</span><span class="copy">コピー</span></span>
+              <span class="status-round">?</span>
+              <span class="status-round"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></span>
+            </div>
+            <div class="wavi-drop"></div>
+          </div>
+
+          <div class="drag-file" aria-hidden="true">
+            <svg viewBox="0 0 18 22"><path d="M1 1h10l6 6v14H1z" fill="#FFFFFF" stroke="#8E8E93" stroke-width="1"/><path d="M11 1v6h6" fill="none" stroke="#8E8E93" stroke-width="1"/></svg>
+            webhook-event.json
+          </div>
+          <svg class="cursor" aria-hidden="true" viewBox="0 0 18 26"><path d="M2 2v19l5-4.6 3.4 7.6 3.2-1.4-3.4-7.4H17z" fill="#FFFFFF" stroke="#1C1C1E" stroke-width="1.3" stroke-linejoin="round"/></svg>
+        </div>
+      </section>
+
+      <section class="keys-wrap">
+        <div class="keys">
+          <span><b>⌘O</b> 開く</span>
+          <span class="sep">／</span>
+          <span><b>⌘V</b> 貼り付け</span>
+          <span class="sep">／</span>
+          <span><b>⌘⇧C</b> 全部コピー</span>
+          <span class="sep">／</span>
+          <span><b>wv</b> file</span>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <div>
+        <span>Wavi — ワビとも、ウェイビーとも。</span>
+        <span>© 2026 hrkmtsmt</span>
+      </div>
+    </footer>
+  </body>
+</html>

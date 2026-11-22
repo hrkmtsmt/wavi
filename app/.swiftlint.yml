@@ -1,6 +1,6 @@
 # SwiftLint checks code patterns. Layout is swift-format's job (.swift-format), so rules that fight its output are turned off here.
 included:
-  - App
+  - Sources
   - Tests
 
 disabled_rules:

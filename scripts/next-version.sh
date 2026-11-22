@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Prints the next version (without "v") from the Conventional Commits since the latest vX.Y.Z tag, or nothing when no commit calls for a release.
+# Prints the next version (without "v") of the macOS app from the Conventional Commits since the latest vX.Y.Z tag, or nothing when no commit calls for a release. Only commits that change app/ count; the website and repo tooling don't version the app.
 #
 #   BREAKING CHANGE footer or "type!:"  -> major
 #   release:                            -> major, on purpose (e.g. 0.x -> 1.0.0)
@@ -39,7 +39,7 @@ while IFS= read -r -d '' message; do
     elif [[ "$subject" =~ $fix ]]; then
         if ((level < 1)); then level=1; fi
     fi
-done < <(git log -z --format=%B "$range") # -z: NUL between messages, no extra newline
+done < <(git log -z --format=%B "$range" -- ':/app') # -z: NUL between messages, no extra newline; ':/app' is app/ from the repo root, wherever this runs
 
 case $level in
     3) echo "$((major + 1)).0.0" ;;
