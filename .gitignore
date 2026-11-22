@@ -1,0 +1,12 @@
+# Xcode
+Wavi.xcodeproj/
+build/
+DerivedData/
+*.xcuserstate
+xcuserdata/
+
+# Design documents are not committed
+SPEC.md
+.docs/
+
+.DS_Store
