@@ -1,8 +1,7 @@
 import AppKit
 import SwiftUI
 
-/// A view that takes file drags for the whole window. Views below it that also
-/// accept drags (the text view) hand file drags up to it.
+/// A view that takes file drags for the whole window. Views below it that also accept drags (the text view) hand file drags up to it.
 protocol FileDropTarget: AnyObject {}
 
 /// Hosts the SwiftUI screen and accepts file drops anywhere in the window.

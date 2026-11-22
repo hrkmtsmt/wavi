@@ -15,11 +15,9 @@ enum GlassShape {
     }
 }
 
-/// The base of every glass face in Wavi: a shape times a density.
-/// Other components never draw glass themselves; they go through this.
+/// The base of every glass face in Wavi: a shape times a density. Other components never draw glass themselves; they go through this.
 ///
-/// Uses the system Liquid Glass (`glassEffect`). Density differences are
-/// approximated with tint only; mockup opacities are not copied.
+/// Uses the system Liquid Glass (`glassEffect`). Density differences are approximated with tint only; mockup opacities are not copied.
 struct GlassSurface: ViewModifier {
     let level: GlassLevel
     let shape: GlassShape

@@ -1,7 +1,6 @@
 import SwiftUI
 
-/// A key (bold) on the left and its description on the right.
-/// The key column is at least 48pt so descriptions line up.
+/// A key (bold) on the left and its description on the right. The key column is at least 48pt so descriptions line up.
 struct KeyRow: View {
     let key: String
     let description: String

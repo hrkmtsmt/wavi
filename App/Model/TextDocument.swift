@@ -1,8 +1,7 @@
 import Foundation
 import Observation
 
-/// One tab's text and what Wavi knows about it.
-/// The live text is edited by the Editor; it writes every change back to `text`.
+/// One tab's text and what Wavi knows about it. The live text is edited by the Editor; it writes every change back to `text`.
 @Observable
 final class TextDocument: Identifiable {
     let id = UUID()
@@ -48,8 +47,7 @@ final class TextDocument: Identifiable {
         return ext.isEmpty ? "TEXT" : ext.uppercased()
     }
 
-    /// Data to write to disk. Lone line feeds typed into a CRLF / CR file
-    /// are converted to that file's line ending.
+    /// Data to write to disk. Lone line feeds typed into a CRLF / CR file are converted to that file's line ending.
     func dataForSaving() -> (Data, fellBackToUTF8: Bool) {
         let normalized = normalizedLineEndings(text)
         if let data = TextDecoder.encode(normalized, as: encoding, byteOrderMark: hasByteOrderMark) {

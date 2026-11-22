@@ -73,8 +73,7 @@ final class DocumentWindowController: NSWindowController, NSWindowDelegate, NSMe
     func windowDidBecomeKey(_ notification: Notification) { layoutTrafficLights() }
     func windowDidExitFullScreen(_ notification: Notification) { layoutTrafficLights() }
 
-    /// Centers the OS traffic lights on the tab bar row (16 from the left, tab bar
-    /// center 36 from the top). The buttons themselves are the system's.
+    /// Centers the OS traffic lights on the tab bar row (16 from the left, tab bar center 36 from the top). The buttons themselves are the system's.
     private func layoutTrafficLights() {
         guard let window, !window.styleMask.contains(.fullScreen) else { return }
         let types: [NSWindow.ButtonType] = [.closeButton, .miniaturizeButton, .zoomButton]
@@ -258,7 +257,6 @@ final class DocumentWindowController: NSWindowController, NSWindowDelegate, NSMe
 }
 
 extension TextDocument {
-    /// Only files on disk ask before closing. Untitled text is a scratch pad
-    /// and is discarded without asking (SPEC 7, decided provisionally).
+    /// Only files on disk ask before closing. Untitled text is a scratch pad and is discarded without asking (SPEC 7, decided provisionally).
     var needsSaveConfirmation: Bool { url != nil && isDirty && !isReadOnly }
 }

@@ -1,7 +1,6 @@
 import SwiftUI
 
-/// A 32pt ink-glass button: the main "something happens" action on screen.
-/// States: normal, done (green content), disabled (35% opacity via `.disabled`).
+/// A 32pt ink-glass button: the main "something happens" action on screen. States: normal, done (green content), disabled (35% opacity via `.disabled`).
 struct PillButton: View {
     let title: String
     var systemImage: String?

@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
-# Runs next-version.sh against throwaway git histories. Each block of commits
-# between tags stands for one rebase-merged pull request.
+# Runs next-version.sh against throwaway git histories. Each block of commits between tags stands for one rebase-merged pull request.
 set -u
 NV="$(cd "$(dirname "$0")" && pwd)/next-version.sh"
 cd "$(mktemp -d)"

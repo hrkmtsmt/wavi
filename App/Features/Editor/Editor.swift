@@ -1,8 +1,7 @@
 import AppKit
 import SwiftUI
 
-/// The body text. The one Wavi-specific piece: an NSTextView per tab,
-/// the placeholder of an empty tab, and the full-width-space marks.
+/// The body text. The one Wavi-specific piece: an NSTextView per tab, the placeholder of an empty tab, and the full-width-space marks.
 struct Editor: View {
     let document: TextDocument
     /// All open tabs, so closed tabs' text views can be released.
@@ -44,8 +43,7 @@ struct Editor: View {
     }
 }
 
-/// Hosts one scroll view per document and shows the selected one, so each tab
-/// keeps its own undo history, selection and scroll position.
+/// Hosts one scroll view per document and shows the selected one, so each tab keeps its own undo history, selection and scroll position.
 private struct EditorTextView: NSViewRepresentable {
     let document: TextDocument
     let openDocumentIDs: Set<TextDocument.ID>

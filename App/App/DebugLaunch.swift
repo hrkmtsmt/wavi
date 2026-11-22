@@ -1,8 +1,7 @@
 #if DEBUG
     import Foundation
 
-    /// Debug-only launch arguments to put the window into a given state,
-    /// used to compare the app with the adopted design:
+    /// Debug-only launch arguments to put the window into a given state, used to compare the app with the adopted design:
     ///   -WaviDebugPanel help|settings
     ///   -WaviDebugDrag /path/to/file   (shows the drag state for that file)
     ///   -WaviDebugSelect <index>       (selects a tab after files have opened)

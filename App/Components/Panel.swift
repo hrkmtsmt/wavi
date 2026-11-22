@@ -1,7 +1,6 @@
 import SwiftUI
 
-/// A rounded glass board (radius 24) that stacks PanelSections.
-/// 320pt wide; content that does not fit scrolls inside.
+/// A rounded glass board (radius 24) that stacks PanelSections. 320pt wide; content that does not fit scrolls inside.
 struct Panel<Content: View, Footer: View>: View {
     var title: String?
     var message: String?

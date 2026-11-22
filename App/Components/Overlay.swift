@@ -1,7 +1,6 @@
 import SwiftUI
 
-/// A color film laid over the whole window, with a 2pt inner line and a glow
-/// that thickens toward the edges. Lets mouse events through.
+/// A color film laid over the whole window, with a 2pt inner line and a glow that thickens toward the edges. Lets mouse events through.
 struct Overlay: View {
     var tint: Color = Palette.stateDropTint
     var line: Color = Palette.stateDrop

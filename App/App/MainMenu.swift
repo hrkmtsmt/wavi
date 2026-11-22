@@ -1,7 +1,6 @@
 import AppKit
 
-/// The menu bar. Actions travel the responder chain to the text view and
-/// the DocumentWindowController.
+/// The menu bar. Actions travel the responder chain to the text view and the DocumentWindowController.
 enum MainMenu {
     static func make(strings: Strings) -> NSMenu {
         let main = NSMenu()

@@ -43,8 +43,7 @@ targets:
         INFOPLIST_FILE: App/Info.plist
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         ENABLE_HARDENED_RUNTIME: YES
-        # `wv` is installed into /usr/local/bin and default apps are changed
-        # system-wide, so the app ships outside the App Store sandbox.
+        # `wv` is installed into /usr/local/bin and default apps are changed system-wide, so the app ships outside the App Store sandbox.
         ENABLE_APP_SANDBOX: NO
         COMBINE_HIDPI_IMAGES: YES
   WaviTests:

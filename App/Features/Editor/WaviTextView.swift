@@ -17,8 +17,7 @@ final class WaviTextView: NSTextView {
         super.acceptableDragTypes.filter { !Self.fileTypes.contains($0) }
     }
 
-    // Finder also puts a file's URL on the pasteboard as plain text, which the
-    // text view would insert. Drags that carry files go to the window instead.
+    // Finder also puts a file's URL on the pasteboard as plain text, which the text view would insert. Drags that carry files go to the window instead.
 
     private var fileDropTarget: NSView? {
         var view = superview

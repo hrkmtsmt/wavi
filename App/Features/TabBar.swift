@@ -1,7 +1,6 @@
 import SwiftUI
 
-/// TabBar = PillGroup of Tabs + RoundButton "+".
-/// While a file is dragged over the window, a preview Tab shows where it will open.
+/// TabBar = PillGroup of Tabs + RoundButton "+". While a file is dragged over the window, a preview Tab shows where it will open.
 struct TabBar: View {
     let store: DocumentStore
     let strings: Strings

@@ -1,7 +1,6 @@
 import SwiftUI
 
-/// An on/off choice with the current state written in words to its right.
-/// The system switch is used as-is; only its color is set to `ink`.
+/// An on/off choice with the current state written in words to its right. The system switch is used as-is; only its color is set to `ink`.
 struct Switch: View {
     @Binding var isOn: Bool
     let label: String

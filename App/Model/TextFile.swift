@@ -59,8 +59,7 @@ nonisolated enum TextFileError: Error, Equatable {
     case tooLarge
 }
 
-/// Reads bytes as text: detects the encoding (UTF-8 / UTF-16 / Shift_JIS / EUC-JP),
-/// rejects binary data, and remembers the line ending.
+/// Reads bytes as text: detects the encoding (UTF-8 / UTF-16 / Shift_JIS / EUC-JP), rejects binary data, and remembers the line ending.
 nonisolated enum TextDecoder {
     /// Files above this size are opened read-only.
     static let readOnlyThreshold = 20 * 1_000_000
@@ -104,8 +103,7 @@ nonisolated enum TextDecoder {
         return byteOrderMark ? Data(encoding.byteOrderMark) + body : body
     }
 
-    /// Counts lines the way people read them: empty text has 0 lines,
-    /// and a trailing line break does not start a new line.
+    /// Counts lines the way people read them: empty text has 0 lines, and a trailing line break does not start a new line.
     static func lineCount(_ text: String) -> Int {
         var count = 0
         var lastWasBreak = true

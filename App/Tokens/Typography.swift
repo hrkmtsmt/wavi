@@ -1,9 +1,7 @@
 import AppKit
 import SwiftUI
 
-/// The bundled "mono" family: JetBrains Mono for Latin, falling back to
-/// Gen Jyuu Gothic Monospace for kana, kanji and full-width symbols through
-/// the font descriptor's cascade list. Emoji fall through to Apple Color Emoji.
+/// The bundled "mono" family: JetBrains Mono for Latin, falling back to Gen Jyuu Gothic Monospace for kana, kanji and full-width symbols through the font descriptor's cascade list. Emoji fall through to Apple Color Emoji.
 enum WaviFont {
     private static let latinRegular = "JetBrainsMono-Regular"
     private static let latinBold = "JetBrainsMono-Bold"

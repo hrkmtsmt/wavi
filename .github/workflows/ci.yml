@@ -10,8 +10,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  # Keep these in step with the Xcode and SwiftLint used locally, so the
-  # linters and the compiler give the same answers here as on a Mac.
+  # Keep these in step with the Xcode and SwiftLint used locally, so the linters and the compiler give the same answers here as on a Mac.
   XCODE_APP: /Applications/Xcode_27.1.app
   SWIFTLINT_VERSION: 0.65.1
 

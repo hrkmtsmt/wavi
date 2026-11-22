@@ -13,17 +13,14 @@ A light text viewer and editor for macOS — for when opening an editor is too m
 
 ### Opening it the first time
 
-Wavi is not signed with an Apple Developer ID, so macOS blocks it the first
-time and says it can't check the app for malicious software. Allow it once:
+Wavi is not signed with an Apple Developer ID, so macOS blocks it the first time and says it can't check the app for malicious software. Allow it once:
 
 1. Double-click `Wavi.app`. When macOS says it can't be opened, click **Done**.
 2. Open **System Settings → Privacy & Security** and scroll down to **Security**.
-3. Next to the message about Wavi, click **Open Anyway**. The button is there
-   for about an hour after step 1.
+3. Next to the message about Wavi, click **Open Anyway**. The button is there for about an hour after step 1.
 4. Enter your login password, then click **Open Anyway** again.
 
-From then on Wavi opens normally. Right-click → Open no longer works for this
-since macOS 15.
+From then on Wavi opens normally. Right-click → Open no longer works for this since macOS 15.
 
 If you prefer Terminal, removing the download mark does the same:
 
@@ -31,8 +28,7 @@ If you prefer Terminal, removing the download mark does the same:
 xattr -dr com.apple.quarantine /Applications/Wavi.app
 ```
 
-Each release also lists `Wavi.zip.sha256`; compare it with
-`shasum -a 256 Wavi.zip` to check the download.
+Each release also lists `Wavi.zip.sha256`; compare it with `shasum -a 256 Wavi.zip` to check the download.
 
 ## Build
 
@@ -46,8 +42,7 @@ Run the tests with `xcodebuild -project Wavi.xcodeproj -scheme Wavi test`.
 
 ## Checks
 
-CI (`.github/workflows/ci.yml`) runs these on every pull request. Run them
-locally before pushing:
+CI (`.github/workflows/ci.yml`) runs these on every pull request. Run them locally before pushing:
 
 ```sh
 swift format lint --strict --recursive App Tests        # layout (.swift-format)
@@ -55,16 +50,11 @@ swiftlint lint --strict                                 # code patterns (.swiftl
 xcodebuild -project Wavi.xcodeproj -scheme Wavi test SWIFT_TREAT_WARNINGS_AS_ERRORS=YES
 ```
 
-`swift format format -i --recursive App Tests` fixes layout in place.
-swift-format ships with Xcode; install SwiftLint with `brew install swiftlint`.
+`swift format format -i --recursive App Tests` fixes layout in place. swift-format ships with Xcode; install SwiftLint with `brew install swiftlint`.
 
 ## Release
 
-Pull requests are rebase-merged, and each one becomes at most one release. On
-each push to `main`, `.github/workflows/release.yml` reads the
-[Conventional Commits](https://www.conventionalcommits.org/) since the last
-`vX.Y.Z` tag and applies the largest [semantic version](https://semver.org/)
-bump among them, once:
+Pull requests are rebase-merged, and each one becomes at most one release. On each push to `main`, `.github/workflows/release.yml` reads the [Conventional Commits](https://www.conventionalcommits.org/) since the last `vX.Y.Z` tag and applies the largest [semantic version](https://semver.org/) bump among them, once:
 
 | Commit | Release |
 | --- | --- |
@@ -74,18 +64,13 @@ bump among them, once:
 | `fix:`, `security:` | patch |
 | anything else (`chore:`, `docs:`, `refactor:`, …) | none |
 
-`release:` is not a Conventional Commits type. It lets a major version ship
-without a breaking change.
+`release:` is not a Conventional Commits type. It lets a major version ship without a breaking change.
 
-The workflow then builds the app and publishes a GitHub release with
-`Wavi.zip`, tagging the commit. `scripts/next-version.sh` prints the version it
-would pick; `scripts/test-next-version.sh` checks these rules. Pushing a
-`vX.Y.Z` tag by hand also publishes that version.
+The workflow then builds the app and publishes a GitHub release with `Wavi.zip`, tagging the commit. `scripts/next-version.sh` prints the version it would pick; `scripts/test-next-version.sh` checks these rules. Pushing a `vX.Y.Z` tag by hand also publishes that version.
 
 ## The `wv` command
 
-Open the help panel (`?`) and press "Install the wv command". It links
-`/usr/local/bin/wv` to the script inside the app. Then:
+Open the help panel (`?`) and press "Install the wv command". It links `/usr/local/bin/wv` to the script inside the app. Then:
 
 ```sh
 wv ./file.txt
@@ -104,5 +89,4 @@ wv ./file.txt
 
 ## Fonts
 
-JetBrains Mono and Gen Jyuu Gothic Monospace are bundled under the SIL Open Font
-License 1.1. The license texts ship in `App/Resources/Licenses`.
+JetBrains Mono and Gen Jyuu Gothic Monospace are bundled under the SIL Open Font License 1.1. The license texts ship in `App/Resources/Licenses`.

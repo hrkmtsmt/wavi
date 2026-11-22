@@ -1,7 +1,6 @@
 import SwiftUI
 
-/// A capsule container whose single selected item floats up in white.
-/// The tab bar and the appearance / language switches are this same component.
+/// A capsule container whose single selected item floats up in white. The tab bar and the appearance / language switches are this same component.
 struct PillGroup<Content: View>: View {
     var style: PillGroupStyle = .glass
     @ViewBuilder let content: Content

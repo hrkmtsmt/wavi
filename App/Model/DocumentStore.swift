@@ -74,8 +74,7 @@ final class DocumentStore {
 
     // MARK: - Opening
 
-    /// Opens files. The first one replaces the current tab if it is blank;
-    /// the rest open in new tabs. A file that is already open is selected instead.
+    /// Opens files. The first one replaces the current tab if it is blank; the rest open in new tabs. A file that is already open is selected instead.
     func open(_ urls: [URL]) {
         let previous = openQueue
         openQueue = Task {

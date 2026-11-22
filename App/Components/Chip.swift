@@ -1,7 +1,6 @@
 import SwiftUI
 
-/// An on/off tag, 32pt high. Any number can be on at once.
-/// On: ink glass, white text, leading "✓ ". Off: bar glass, ink text.
+/// An on/off tag, 32pt high. Any number can be on at once. On: ink glass, white text, leading "✓ ". Off: bar glass, ink text.
 struct Chip: View {
     let title: String
     let isOn: Bool

@@ -1,8 +1,6 @@
 import AppKit
 
-/// Installs the `wv` command: a symbolic link in /usr/local/bin pointing at
-/// the script bundled in the app. Asks for an administrator password only
-/// when /usr/local/bin is not writable.
+/// Installs the `wv` command: a symbolic link in /usr/local/bin pointing at the script bundled in the app. Asks for an administrator password only when /usr/local/bin is not writable.
 enum CommandLineTool {
     static let installURL = URL(fileURLWithPath: "/usr/local/bin/wv")
 

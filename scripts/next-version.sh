@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
-# Prints the next version (without "v") from the Conventional Commits since
-# the latest vX.Y.Z tag, or nothing when no commit calls for a release.
+# Prints the next version (without "v") from the Conventional Commits since the latest vX.Y.Z tag, or nothing when no commit calls for a release.
 #
 #   BREAKING CHANGE footer or "type!:"  -> major
 #   release:                            -> major, on purpose (e.g. 0.x -> 1.0.0)
@@ -8,10 +7,7 @@
 #   fix: / security:                    -> patch
 #   anything else                       -> no release
 #
-# Only the largest bump applies, once. PRs are rebase-merged, so one PR reaches
-# main in one push and gets at most one version. With no tag yet, counting
-# starts from 0.0.0. "release:" is not a Conventional Commits type; it exists
-# so a major version can be cut without a breaking change.
+# Only the largest bump applies, once. PRs are rebase-merged, so one PR reaches main in one push and gets at most one version. With no tag yet, counting starts from 0.0.0. "release:" is not a Conventional Commits type; it exists so a major version can be cut without a breaking change.
 # https://semver.org/  https://www.conventionalcommits.org/ja/v1.0.0/
 set -euo pipefail
 

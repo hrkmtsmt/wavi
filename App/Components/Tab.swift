@@ -7,8 +7,7 @@ struct Tab: View {
         case selected(onClose: (() -> Void)?)
         /// Not selected: no background, muted text.
         case idle
-        /// Preview of where a dragged item will open: dashed outline, bar glass,
-        /// name plus a bold detail (for example a size).
+        /// Preview of where a dragged item will open: dashed outline, bar glass, name plus a bold detail (for example a size).
         case preview(detail: String)
     }
 

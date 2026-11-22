@@ -1,9 +1,7 @@
 import AppKit
 import SwiftUI
 
-// Design tokens of the Wavi design system, as Swift constants.
-// Only these values may be used for sizes, spacing, radii and type.
-// Exceptions (OS traffic lights, the window's own size) live where they are used.
+// Design tokens of the Wavi design system, as Swift constants. Only these values may be used for sizes, spacing, radii and type. Exceptions (OS traffic lights, the window's own size) live where they are used.
 
 /// Spacing and size steps: 2 / 4 / 8 / 16 / 24 / 32 / 40 / 48 / 64 / 80.
 nonisolated enum Space {
@@ -26,8 +24,7 @@ nonisolated enum Radius {
     static let r24: CGFloat = 24
 }
 
-/// Colors. Light values come from the design system; dark values are provisional
-/// (dark mode is not designed yet, see SPEC 7).
+/// Colors. Light values come from the design system; dark values are provisional (dark mode is not designed yet, see SPEC 7).
 enum Palette {
     static let surface = dynamic(light: 0xF6F6F7, dark: 0x1C1C1E)
     static let paper = dynamic(light: 0xFFFFFF, dark: 0x2C2C2E)
@@ -114,8 +111,7 @@ nonisolated enum TextStyle {
     }
 }
 
-/// The non-glass "raised" shadow (selected item in a PillGroup).
-/// Glass surfaces get their depth from the system material instead.
+/// The non-glass "raised" shadow (selected item in a PillGroup). Glass surfaces get their depth from the system material instead.
 enum RaisedShadow {
     static let color = Color.black.opacity(0.12)
     static let radius: CGFloat = 4

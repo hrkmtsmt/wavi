@@ -21,8 +21,7 @@ final class DefaultApps {
             })
     }
 
-    /// Turning on makes Wavi the default (macOS shows its own confirmation).
-    /// Turning off hands the type to the next app macOS would choose.
+    /// Turning on makes Wavi the default (macOS shows its own confirmation). Turning off hands the type to the next app macOS would choose.
     func toggle(_ ext: String) async throws {
         guard let type = UTType(filenameExtension: ext) else { return }
         let workspace = NSWorkspace.shared
