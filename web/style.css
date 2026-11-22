@@ -1,0 +1,458 @@
+/* Values come from the adopted design's "ホームページ（左寄せ）". Spacing uses the size tokens; the 1120px page width and the scaled drawing inside the showcase (cqw units) are the exceptions SPEC 8 allows. Light only: dark mode is not designed yet. */
+:root {
+  --surface: #f6f6f7;
+  --paper: #ffffff;
+  --ink: #1c1c1e;
+  --ink-muted: #55555a;
+  --ink-subtle: #6b6b70;
+  --hairline: #e4e4e7;
+  --mono: "JetBrains Mono", "GenJyuuGothic Monospace", "M PLUS Rounded 1c", monospace;
+  --sans: "Noto Sans JP", system-ui, sans-serif;
+}
+
+body {
+  margin: 0;
+  background: var(--surface);
+  color: var(--ink);
+  font-family: var(--sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  color: var(--ink);
+}
+
+a:hover {
+  color: var(--ink-muted);
+}
+
+/* Header: icon + "Wavi", and only a GitHub link on the right. */
+.header {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 24px;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+  font-family: var(--mono);
+  font-size: 20px;
+  line-height: 32px;
+  font-weight: 700;
+}
+
+.header-link {
+  font-family: var(--mono);
+  font-size: 16px;
+  line-height: 24px;
+  text-decoration: none;
+  color: var(--ink-muted);
+}
+
+/* Heading, description and the one download button, all on the left edge. */
+.hero {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 64px 24px 48px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 24px;
+}
+
+.hero h1 {
+  margin: 0;
+  font-family: var(--mono);
+  font-size: 24px;
+  line-height: 32px;
+  font-weight: 700;
+}
+
+.hero p {
+  margin: 0;
+  font-size: 16px;
+  line-height: 32px;
+  color: var(--ink-muted);
+}
+
+.download {
+  margin-top: 8px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 24px;
+  border-radius: 9999px;
+  background: linear-gradient(180deg, #3a3a3e 0%, #161618 60%, #08080a 100%);
+  color: #ffffff;
+  font-family: var(--mono);
+  font-size: 16px;
+  font-weight: 700;
+  text-decoration: none;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35), 0 0 0 0.5px rgba(0, 0, 0, 0.5), 0 8px 24px -8px rgba(0, 0, 0, 0.45);
+}
+
+.download:hover {
+  color: #ffffff;
+  opacity: 0.9;
+}
+
+/* Showcase: dragging webhook-event.json from Finder onto Wavi, drawn to scale with cqw units. */
+.showcase-wrap {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 0 24px 24px;
+  box-sizing: border-box;
+}
+
+.showcase {
+  position: relative;
+  container-type: inline-size;
+  aspect-ratio: 16 / 10;
+  border-radius: 24px;
+  overflow: hidden;
+  background: linear-gradient(165deg, #34363b 0%, #24262a 55%, #1c1d20 100%);
+}
+
+.dot {
+  border-radius: 50%;
+}
+
+.dot.red {
+  background: #ff5f57;
+}
+
+.dot.yellow {
+  background: #febc2e;
+}
+
+.dot.green {
+  background: #28c840;
+}
+
+.finder {
+  position: absolute;
+  left: 4.5%;
+  top: 16%;
+  width: 38%;
+  height: 60%;
+  border-radius: 1.6cqw;
+  overflow: hidden;
+  background: #f3f3f5;
+  box-shadow: 0 0 0 0.5px rgba(0, 0, 0, 0.3), 0 2.5cqw 5cqw -1.5cqw rgba(0, 0, 0, 0.55);
+  display: flex;
+  flex-direction: column;
+  font-size: 1.05cqw;
+  color: var(--ink);
+}
+
+.finder-bar {
+  height: 9%;
+  display: flex;
+  align-items: center;
+  gap: 0.6cqw;
+  padding: 0 1.4cqw;
+  border-bottom: 0.5px solid #dadadf;
+}
+
+.finder-bar .dot {
+  width: 0.9cqw;
+  height: 0.9cqw;
+}
+
+.finder-title {
+  margin-left: 1.4cqw;
+  font-weight: 500;
+}
+
+.finder-body {
+  flex-grow: 1;
+  display: flex;
+}
+
+.finder-side {
+  width: 30%;
+  padding: 1.2cqw 0.8cqw;
+  background: #e9e9ec;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5cqw;
+  color: var(--ink-muted);
+}
+
+.finder-side span {
+  padding: 0.3cqw 0.6cqw;
+}
+
+.finder-side .selected {
+  border-radius: 0.5cqw;
+  background: rgba(0, 0, 0, 0.08);
+  color: var(--ink);
+}
+
+.finder-files {
+  flex-grow: 1;
+  padding: 0.8cqw 0;
+  display: flex;
+  flex-direction: column;
+  font-family: var(--mono);
+}
+
+.finder-files div {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.55cqw 1.2cqw;
+  margin: 0 0.6cqw;
+}
+
+.finder-files div span:last-child {
+  color: var(--ink-subtle);
+}
+
+.finder-files .picked {
+  border-radius: 0.5cqw;
+  background: #d6dae0;
+}
+
+.finder-files .picked span:last-child {
+  color: var(--ink-muted);
+}
+
+.wavi {
+  position: absolute;
+  right: 4.5%;
+  top: 22%;
+  width: 50%;
+  aspect-ratio: 3 / 2;
+  border-radius: 1.33cqw;
+  overflow: hidden;
+  background: rgba(250, 250, 252, 0.9);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9), 0 0 0 0.5px rgba(0, 0, 0, 0.3), 0 3cqw 6cqw -1.5cqw rgba(0, 0, 0, 0.6);
+  font-family: var(--mono);
+  font-size: 0.9cqw;
+  line-height: 1.4;
+  color: var(--ink);
+}
+
+.wavi-lights {
+  position: absolute;
+  left: 1.78%;
+  top: 4.5%;
+  display: flex;
+  gap: 0.44cqw;
+}
+
+.wavi-lights .dot {
+  width: 0.67cqw;
+  height: 0.67cqw;
+}
+
+.wavi-tabs {
+  position: absolute;
+  left: 8.9%;
+  top: 2.67%;
+  display: flex;
+  align-items: center;
+  gap: 0.44cqw;
+}
+
+.glass-track {
+  display: flex;
+  padding: 0.22cqw;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.38);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.95), 0 0 0 0.5px rgba(0, 0, 0, 0.08), 0 0.45cqw 0.9cqw -0.45cqw rgba(10, 14, 30, 0.22);
+}
+
+.preview-tab {
+  height: 1.78cqw;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  gap: 0.44cqw;
+  padding: 0 0.89cqw;
+  border-radius: 9999px;
+  border: 0.12cqw dashed rgba(47, 111, 224, 0.65);
+  background: rgba(255, 255, 255, 0.6);
+  white-space: nowrap;
+}
+
+.glass-round {
+  width: 2.22cqw;
+  height: 2.22cqw;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.38);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.95), 0 0 0 0.5px rgba(0, 0, 0, 0.08), 0 0.45cqw 0.9cqw -0.45cqw rgba(10, 14, 30, 0.22);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.glass-round svg,
+.status-round svg {
+  width: 0.9cqw;
+  height: 0.9cqw;
+}
+
+.wavi-release {
+  position: absolute;
+  left: 8.9%;
+  top: 14.67%;
+  font-size: 1.1cqw;
+  white-space: nowrap;
+}
+
+.wavi-release b {
+  color: #2f6fe0;
+}
+
+.wavi-status {
+  position: absolute;
+  left: 8.9%;
+  bottom: 4%;
+  display: flex;
+  align-items: center;
+  gap: 0.44cqw;
+  white-space: nowrap;
+}
+
+.status-pill {
+  display: flex;
+  align-items: center;
+  gap: 0.89cqw;
+  padding: 0.22cqw 0.22cqw 0.22cqw 0.89cqw;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.6);
+  box-shadow: inset 0 1px 0 #ffffff, 0 0 0 0.5px rgba(0, 0, 0, 0.1), 0 0.9cqw 1.8cqw -0.9cqw rgba(10, 14, 30, 0.4);
+}
+
+.status-pill .muted {
+  color: var(--ink-muted);
+}
+
+.status-pill .size {
+  font-size: 1.1cqw;
+}
+
+.status-pill .copy {
+  height: 1.78cqw;
+  display: flex;
+  align-items: center;
+  padding: 0 0.89cqw;
+  border-radius: 9999px;
+  background: linear-gradient(180deg, #3a3a3e, #08080a);
+  color: #ffffff;
+  font-weight: 700;
+  opacity: 0.35;
+}
+
+.status-round {
+  width: 2.22cqw;
+  height: 2.22cqw;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.6);
+  box-shadow: inset 0 1px 0 #ffffff, 0 0 0 0.5px rgba(0, 0, 0, 0.1), 0 0.9cqw 1.8cqw -0.9cqw rgba(10, 14, 30, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+}
+
+.wavi-drop {
+  position: absolute;
+  inset: 0;
+  border-radius: 1.33cqw;
+  background: rgba(60, 130, 246, 0.1);
+  box-shadow: inset 0 0 0 0.12cqw rgba(47, 111, 224, 0.55), inset 0 0 3.6cqw rgba(60, 130, 246, 0.16);
+  pointer-events: none;
+}
+
+.drag-file {
+  position: absolute;
+  left: 41%;
+  top: 43%;
+  display: flex;
+  align-items: center;
+  gap: 0.6cqw;
+  padding: 0.5cqw 1cqw 0.5cqw 0.6cqw;
+  border-radius: 0.7cqw;
+  background: rgba(214, 218, 224, 0.92);
+  box-shadow: 0 1.2cqw 2.4cqw -0.8cqw rgba(0, 0, 0, 0.5);
+  font-family: var(--mono);
+  font-size: 1.05cqw;
+  white-space: nowrap;
+  opacity: 0.95;
+}
+
+.drag-file svg {
+  width: 1.8cqw;
+  height: 2.2cqw;
+}
+
+.cursor {
+  position: absolute;
+  left: 43.5%;
+  top: 47.5%;
+  width: 1.8cqw;
+  height: 2.6cqw;
+}
+
+/* One status-bar-like line, the same capsule as the app's footer. */
+.keys-wrap {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 0 24px 80px;
+  box-sizing: border-box;
+}
+
+.keys {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 16px;
+  padding: 16px 24px;
+  border-radius: 9999px;
+  background: var(--paper);
+  box-shadow: inset 0 1px 0 #ffffff, 0 0 0 0.5px rgba(0, 0, 0, 0.1), 0 8px 24px -16px rgba(20, 22, 28, 0.3);
+  font-family: var(--mono);
+  font-size: 16px;
+  line-height: 24px;
+  color: #3a3a3c;
+}
+
+.keys b {
+  color: var(--ink);
+  font-weight: 700;
+}
+
+.keys .sep {
+  color: #b0b0b5;
+}
+
+.footer {
+  border-top: 1px solid var(--hairline);
+}
+
+.footer div {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 32px 24px 48px;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  font-size: 12px;
+  line-height: 16px;
+  color: var(--ink-subtle);
+}

@@ -10,3 +10,6 @@ SPEC.md
 .docs/
 
 .DS_Store
+
+# Local preview server for the Browser pane
+.claude/launch.json
