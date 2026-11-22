@@ -1,0 +1,25 @@
+#!/bin/sh
+# wv — open files in Wavi.
+#   wv ./file.txt        Open a file (in a new tab when Wavi is already running)
+#   wv a.json b.log      Open several files
+#   wv                   Bring Wavi to the front
+set -eu
+
+bundle_id="com.hrkmtsmt.Wavi"
+
+if [ "$#" -eq 0 ]; then
+  exec open -b "$bundle_id"
+fi
+
+for file in "$@"; do
+  if [ ! -e "$file" ]; then
+    echo "wv: $file: No such file or directory" >&2
+    exit 1
+  fi
+  if [ -d "$file" ]; then
+    echo "wv: $file: Is a directory" >&2
+    exit 1
+  fi
+done
+
+exec open -b "$bundle_id" "$@"
