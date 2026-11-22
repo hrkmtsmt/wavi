@@ -1,8 +1,12 @@
 import AppKit
 import SwiftUI
 
+/// A view that takes file drags for the whole window. Views below it that also
+/// accept drags (the text view) hand file drags up to it.
+protocol FileDropTarget: AnyObject {}
+
 /// Hosts the SwiftUI screen and accepts file drops anywhere in the window.
-final class DropHostingView<Content: View>: NSHostingView<Content> {
+final class DropHostingView<Content: View>: NSHostingView<Content>, FileDropTarget {
     var onDragEntered: ([URL]) -> Void = { _ in }
     var onDragExited: () -> Void = {}
     var onDrop: ([URL]) -> Void = { _ in }

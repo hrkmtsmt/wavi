@@ -17,6 +17,52 @@ final class WaviTextView: NSTextView {
         super.acceptableDragTypes.filter { !Self.fileTypes.contains($0) }
     }
 
+    // Finder also puts a file's URL on the pasteboard as plain text, which the
+    // text view would insert. Drags that carry files go to the window instead.
+
+    private var fileDropTarget: NSView? {
+        var view = superview
+        while let current = view {
+            if current is FileDropTarget { return current }
+            view = current.superview
+        }
+        return nil
+    }
+
+    private func carriesFiles(_ info: NSDraggingInfo) -> Bool {
+        info.draggingPasteboard.canReadObject(forClasses: [NSURL.self], options: [.urlReadingFileURLsOnly: true])
+    }
+
+    override func draggingEntered(_ sender: NSDraggingInfo) -> NSDragOperation {
+        if carriesFiles(sender), let target = fileDropTarget { return target.draggingEntered(sender) }
+        return super.draggingEntered(sender)
+    }
+
+    override func draggingUpdated(_ sender: NSDraggingInfo) -> NSDragOperation {
+        if carriesFiles(sender), let target = fileDropTarget { return target.draggingUpdated(sender) }
+        return super.draggingUpdated(sender)
+    }
+
+    override func draggingExited(_ sender: NSDraggingInfo?) {
+        if let sender, carriesFiles(sender), let target = fileDropTarget { return target.draggingExited(sender) }
+        super.draggingExited(sender)
+    }
+
+    override func prepareForDragOperation(_ sender: NSDraggingInfo) -> Bool {
+        if carriesFiles(sender), let target = fileDropTarget { return target.prepareForDragOperation(sender) }
+        return super.prepareForDragOperation(sender)
+    }
+
+    override func performDragOperation(_ sender: NSDraggingInfo) -> Bool {
+        if carriesFiles(sender), let target = fileDropTarget { return target.performDragOperation(sender) }
+        return super.performDragOperation(sender)
+    }
+
+    override func concludeDragOperation(_ sender: NSDraggingInfo?) {
+        if let sender, carriesFiles(sender) { return }
+        super.concludeDragOperation(sender)
+    }
+
     override func drawBackground(in rect: NSRect) {
         super.drawBackground(in: rect)
         if showsFullWidthSpace { drawFullWidthSpaceMarks(in: rect) }
