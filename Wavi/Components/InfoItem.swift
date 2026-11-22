@@ -5,7 +5,7 @@ struct InfoItem: View {
     enum Kind {
         /// 12pt, muted.
         case label
-        /// 16pt bold, ink. One step larger so it reads at a glance.
+        /// 12pt bold, ink. Same size as labels; weight and color set it apart.
         case value
     }
 
@@ -17,7 +17,7 @@ struct InfoItem: View {
         case .label:
             Text(text).textStyle(.mono12).foregroundStyle(Palette.inkMuted)
         case .value:
-            Text(text).textStyle(.mono16, bold: true).foregroundStyle(Palette.ink)
+            Text(text).textStyle(.mono12, bold: true).foregroundStyle(Palette.ink)
         }
     }
 }
