@@ -16,6 +16,20 @@ xcodebuild -project Wavi.xcodeproj -scheme Wavi build
 
 Run the tests with `xcodebuild -project Wavi.xcodeproj -scheme Wavi test`.
 
+## Checks
+
+CI (`.github/workflows/ci.yml`) runs these on every pull request. Run them
+locally before pushing:
+
+```sh
+swift format lint --strict --recursive Wavi WaviTests   # layout (.swift-format)
+swiftlint lint --strict                                 # code patterns (.swiftlint.yml)
+xcodebuild -project Wavi.xcodeproj -scheme Wavi test SWIFT_TREAT_WARNINGS_AS_ERRORS=YES
+```
+
+`swift format format -i --recursive Wavi WaviTests` fixes layout in place.
+swift-format ships with Xcode; install SwiftLint with `brew install swiftlint`.
+
 ## The `wv` command
 
 Open the help panel (`?`) and press "Install the wv command". It links
