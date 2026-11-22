@@ -1,0 +1,48 @@
+name: Release
+
+# Push a tag like v1.0.0 to publish a release with Wavi.zip attached.
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+env:
+  XCODE_APP: /Applications/Xcode_27.1.app
+
+jobs:
+  release:
+    runs-on: xcode-27
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Select Xcode
+        run: sudo xcode-select -s "$XCODE_APP"
+
+      - name: Build
+        run: |
+          brew install xcodegen
+          xcodegen generate
+          # The app is not signed with a Developer ID, only ad-hoc ("-"), so
+          # Gatekeeper asks users to allow it once. See the README.
+          xcodebuild build \
+            -project Wavi.xcodeproj \
+            -scheme Wavi \
+            -configuration Release \
+            -destination 'platform=macOS' \
+            -derivedDataPath build/DerivedData \
+            MARKETING_VERSION="${GITHUB_REF_NAME#v}" \
+            CURRENT_PROJECT_VERSION="${GITHUB_RUN_NUMBER}"
+
+      - name: Package
+        run: |
+          # ditto keeps the bundle's symlinks, permissions and signature intact.
+          ditto -c -k --keepParent build/DerivedData/Build/Products/Release/Wavi.app Wavi.zip
+          shasum -a 256 Wavi.zip > Wavi.zip.sha256
+
+      - name: Publish
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "$GITHUB_REF_NAME" Wavi.zip Wavi.zip.sha256 --generate-notes
