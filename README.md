@@ -50,12 +50,12 @@ CI (`.github/workflows/ci.yml`) runs these on every pull request. Run them
 locally before pushing:
 
 ```sh
-swift format lint --strict --recursive Wavi WaviTests   # layout (.swift-format)
+swift format lint --strict --recursive App Tests        # layout (.swift-format)
 swiftlint lint --strict                                 # code patterns (.swiftlint.yml)
 xcodebuild -project Wavi.xcodeproj -scheme Wavi test SWIFT_TREAT_WARNINGS_AS_ERRORS=YES
 ```
 
-`swift format format -i --recursive Wavi WaviTests` fixes layout in place.
+`swift format format -i --recursive App Tests` fixes layout in place.
 swift-format ships with Xcode; install SwiftLint with `brew install swiftlint`.
 
 ## Release
@@ -81,14 +81,14 @@ wv ./file.txt
 
 | Folder | Contents |
 | --- | --- |
-| `Wavi/Tokens` | Design tokens (spacing, radii, colors, glass levels, type) |
-| `Wavi/Components` | Generic components: GlassSurface, RoundButton, PillButton, Chip, PillGroup, Tab, Switch, KeyRow, InfoItem, Panel, Overlay |
-| `Wavi/Features` | TabBar, StatusBar, HelpPanel, SettingsPanel, DropOverlay, Editor |
-| `Wavi/Window` | DocumentWindow, the only window |
-| `Wavi/Model` | Documents, encoding detection, settings, UI strings |
-| `Wavi/Services` | `wv` installation and default-app settings |
+| `App/Tokens` | Design tokens (spacing, radii, colors, glass levels, type) |
+| `App/Components` | Generic components: GlassSurface, RoundButton, PillButton, Chip, PillGroup, Tab, Switch, KeyRow, InfoItem, Panel, Overlay |
+| `App/Features` | TabBar, StatusBar, HelpPanel, SettingsPanel, DropOverlay, Editor |
+| `App/Window` | DocumentWindow, the only window |
+| `App/Model` | Documents, encoding detection, settings, UI strings |
+| `App/Services` | `wv` installation and default-app settings |
 
 ## Fonts
 
 JetBrains Mono and Gen Jyuu Gothic Monospace are bundled under the SIL Open Font
-License 1.1. The license texts ship in `Wavi/Resources/Licenses`.
+License 1.1. The license texts ship in `App/Resources/Licenses`.

@@ -1,8 +1,8 @@
 # SwiftLint checks code patterns. Layout is swift-format's job (.swift-format),
 # so rules that fight its output are turned off here.
 included:
-  - Wavi
-  - WaviTests
+  - App
+  - Tests
 
 disabled_rules:
   - trailing_comma # swift-format adds trailing commas to multi-line collections

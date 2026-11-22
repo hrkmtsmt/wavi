@@ -37,7 +37,7 @@ jobs:
           echo "$RUNNER_TEMP/swiftlint" >> "$GITHUB_PATH"
 
       - name: swift-format
-        run: swift format lint --strict --recursive Wavi WaviTests
+        run: swift format lint --strict --recursive App Tests
 
       - name: SwiftLint
         run: swiftlint lint --strict --quiet --reporter github-actions-logging
