@@ -39,8 +39,9 @@ struct Strings {
     // Help panel
     var helpTitle: String { t("Wavi の使い方", "How to use Wavi") }
     var helpMessage: String {
-        t("ファイルをドロップするか、⌘V で貼り付ける。開いた瞬間に、サイズと中身がわかります。",
-          "Drop a file or paste with ⌘V. The moment it opens, you see its size and contents.")
+        t(
+            "ファイルをドロップするか、⌘V で貼り付ける。開いた瞬間に、サイズと中身がわかります。",
+            "Drop a file or paste with ⌘V. The moment it opens, you see its size and contents.")
     }
     var shortcuts: String { t("ショートカット", "Shortcuts") }
     var open: String { t("開く", "Open") }
@@ -80,8 +81,9 @@ struct Strings {
     var dontSave: String { t("保存しない", "Don’t Save") }
     var cancel: String { t("キャンセル", "Cancel") }
     var encodingFallback: String {
-        t("元の文字コードで表せない文字があるため、UTF-8 で保存しました。",
-          "Some characters can’t be written in the original encoding, so the file was saved as UTF-8.")
+        t(
+            "元の文字コードで表せない文字があるため、UTF-8 で保存しました。",
+            "Some characters can’t be written in the original encoding, so the file was saved as UTF-8.")
     }
     var installFailed: String { t("wv を入れられませんでした。", "Couldn’t install the wv command.") }
     var defaultAppFailed: String { t("既定のアプリを変更できませんでした。", "Couldn’t change the default app.") }

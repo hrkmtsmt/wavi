@@ -12,11 +12,13 @@ final class DefaultApps {
 
     func refresh() {
         let bundleURL = Bundle.main.bundleURL.standardizedFileURL
-        enabled = Set(Self.extensions.filter { ext in
-            guard let type = UTType(filenameExtension: ext),
-                  let app = NSWorkspace.shared.urlForApplication(toOpen: type) else { return false }
-            return app.standardizedFileURL == bundleURL
-        })
+        enabled = Set(
+            Self.extensions.filter { ext in
+                guard let type = UTType(filenameExtension: ext),
+                    let app = NSWorkspace.shared.urlForApplication(toOpen: type)
+                else { return false }
+                return app.standardizedFileURL == bundleURL
+            })
     }
 
     /// Turning on makes Wavi the default (macOS shows its own confirmation).

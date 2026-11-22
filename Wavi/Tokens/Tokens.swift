@@ -54,17 +54,19 @@ enum Palette {
     static let fillClose = dynamicAlpha(light: (0x000000, 0.05), dark: (0xFFFFFF, 0.10))
 
     static func dynamic(light: UInt32, dark: UInt32) -> Color {
-        Color(nsColor: NSColor(name: nil) { appearance in
-            appearance.isDark ? NSColor(hex: dark) : NSColor(hex: light)
-        })
+        Color(
+            nsColor: NSColor(name: nil) { appearance in
+                appearance.isDark ? NSColor(hex: dark) : NSColor(hex: light)
+            })
     }
 
     static func dynamicAlpha(light: (UInt32, CGFloat), dark: (UInt32, CGFloat)) -> Color {
-        Color(nsColor: NSColor(name: nil) { appearance in
-            appearance.isDark
-                ? NSColor(hex: dark.0).withAlphaComponent(dark.1)
-                : NSColor(hex: light.0).withAlphaComponent(light.1)
-        })
+        Color(
+            nsColor: NSColor(name: nil) { appearance in
+                appearance.isDark
+                    ? NSColor(hex: dark.0).withAlphaComponent(dark.1)
+                    : NSColor(hex: light.0).withAlphaComponent(light.1)
+            })
     }
 }
 

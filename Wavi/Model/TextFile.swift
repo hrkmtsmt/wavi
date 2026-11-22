@@ -88,14 +88,13 @@ nonisolated enum TextDecoder {
         }
 
         let candidates: [TextEncoding] = [.shiftJIS, .eucJP]
-        var best: (TextEncoding, String, Int)?
-        for encoding in candidates {
-            guard let text = String(data: data, encoding: encoding.foundation) else { continue }
-            let score = japaneseScore(text)
-            if best == nil || score > best!.2 { best = (encoding, text, score) }
+        let decoded = candidates.compactMap { encoding in
+            String(data: data, encoding: encoding.foundation).map { (encoding: encoding, text: $0) }
         }
-        if let best {
-            return DecodedText(text: best.1, encoding: best.0, hasByteOrderMark: false, lineEnding: lineEnding(of: best.1))
+        // On a tie the earlier candidate wins.
+        if let best = decoded.max(by: { japaneseScore($0.text) < japaneseScore($1.text) }) {
+            return DecodedText(
+                text: best.text, encoding: best.encoding, hasByteOrderMark: false, lineEnding: lineEnding(of: best.text))
         }
         throw .binary
     }
@@ -131,11 +130,18 @@ nonisolated enum TextDecoder {
     }
 
     static func lineEnding(of text: String) -> LineEnding {
-        var lf = 0, crlf = 0, cr = 0
+        var lf = 0
+        var crlf = 0
+        var cr = 0
         var previousWasCR = false
         for unit in text.utf8.prefix(1_000_000) {
             if unit == 0x0A {
-                if previousWasCR { crlf += 1; cr -= 1 } else { lf += 1 }
+                if previousWasCR {
+                    crlf += 1
+                    cr -= 1
+                } else {
+                    lf += 1
+                }
                 previousWasCR = false
             } else if unit == 0x0D {
                 cr += 1
@@ -166,7 +172,8 @@ nonisolated enum TextDecoder {
     private static func utf16WithoutBOM(_ data: Data) -> TextEncoding? {
         let sample = [UInt8](data.prefix(4096))
         guard sample.count >= 4, sample.count % 2 == 0 else { return nil }
-        var evenZeros = 0, oddZeros = 0
+        var evenZeros = 0
+        var oddZeros = 0
         for (index, byte) in sample.enumerated() where byte == 0 {
             if index % 2 == 0 { evenZeros += 1 } else { oddZeros += 1 }
         }
@@ -181,11 +188,11 @@ nonisolated enum TextDecoder {
         var score = 0
         for scalar in text.unicodeScalars {
             switch scalar.value {
-            case 0x3040...0x30FF: score += 3 // kana
-            case 0x4E00...0x9FFF: score += 2 // common kanji
-            case 0x3000...0x303F, 0xFF01...0xFF5E: score += 1 // full-width punctuation
-            case 0xFF61...0xFF9F: score -= 1 // half-width kana: common in mis-decoding
-            case 0xE000...0xF8FF, 0xFFFD: score -= 5 // private use / replacement
+            case 0x3040...0x30FF: score += 3  // kana
+            case 0x4E00...0x9FFF: score += 2  // common kanji
+            case 0x3000...0x303F, 0xFF01...0xFF5E: score += 1  // full-width punctuation
+            case 0xFF61...0xFF9F: score -= 1  // half-width kana: common in mis-decoding
+            case 0xE000...0xF8FF, 0xFFFD: score -= 5  // private use / replacement
             default: break
             }
         }

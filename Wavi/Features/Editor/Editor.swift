@@ -68,7 +68,7 @@ private struct EditorTextView: NSViewRepresentable {
         coordinator.hideCaret(context.environment.isDragging)
 
         if scrollView.superview !== container {
-            container.subviews.forEach { $0.removeFromSuperview() }
+            for subview in container.subviews { subview.removeFromSuperview() }
             scrollView.frame = container.bounds
             scrollView.autoresizingMask = [.width, .height]
             container.addSubview(scrollView)
@@ -95,13 +95,14 @@ private struct EditorTextView: NSViewRepresentable {
             if let textView = scrollView.documentView as? WaviTextView {
                 textView.delegate = self
                 documents[ObjectIdentifier(textView)] = document
-                observers.append(NotificationCenter.default.addObserver(
-                    forName: NSView.boundsDidChangeNotification,
-                    object: scrollView.contentView,
-                    queue: .main
-                ) { [weak textView] _ in
-                    MainActor.assumeIsolated { textView?.needsDisplay = true }
-                })
+                observers.append(
+                    NotificationCenter.default.addObserver(
+                        forName: NSView.boundsDidChangeNotification,
+                        object: scrollView.contentView,
+                        queue: .main
+                    ) { [weak textView] _ in
+                        MainActor.assumeIsolated { textView?.needsDisplay = true }
+                    })
             }
             scrollViews[document.id] = scrollView
             return scrollView
@@ -126,7 +127,8 @@ private struct EditorTextView: NSViewRepresentable {
 
         func textDidChange(_ notification: Notification) {
             guard let textView = notification.object as? NSTextView,
-                  let document = documents[ObjectIdentifier(textView)] else { return }
+                let document = documents[ObjectIdentifier(textView)]
+            else { return }
             document.text = textView.string
             textView.needsDisplay = true
         }
@@ -165,16 +167,7 @@ private struct EditorTextView: NSViewRepresentable {
             textView.defaultParagraphStyle = paragraph
             textView.typingAttributes = attributes
             textView.insertionPointColor = NSColor(Palette.ink)
-            // Plain text, exactly as typed: no smart replacements.
-            textView.isAutomaticQuoteSubstitutionEnabled = false
-            textView.isAutomaticDashSubstitutionEnabled = false
-            textView.isAutomaticTextReplacementEnabled = false
-            textView.isAutomaticSpellingCorrectionEnabled = false
-            textView.isContinuousSpellCheckingEnabled = false
-            textView.isGrammarCheckingEnabled = false
-            textView.isAutomaticLinkDetectionEnabled = false
-            textView.isAutomaticDataDetectionEnabled = false
-            textView.smartInsertDeleteEnabled = false
+            disableSmartReplacements(in: textView)
             textView.setAccessibilityLabel(Strings(language: .system).body)
 
             if !document.text.isEmpty {
@@ -192,6 +185,19 @@ private struct EditorTextView: NSViewRepresentable {
             textView.minSize = .zero
             textView.maxSize = NSSize(width: CGFloat.greatestFiniteMagnitude, height: CGFloat.greatestFiniteMagnitude)
             return scrollView
+        }
+
+        /// Plain text, exactly as typed: no smart replacements.
+        private static func disableSmartReplacements(in textView: NSTextView) {
+            textView.isAutomaticQuoteSubstitutionEnabled = false
+            textView.isAutomaticDashSubstitutionEnabled = false
+            textView.isAutomaticTextReplacementEnabled = false
+            textView.isAutomaticSpellingCorrectionEnabled = false
+            textView.isContinuousSpellCheckingEnabled = false
+            textView.isGrammarCheckingEnabled = false
+            textView.isAutomaticLinkDetectionEnabled = false
+            textView.isAutomaticDataDetectionEnabled = false
+            textView.smartInsertDeleteEnabled = false
         }
     }
 }

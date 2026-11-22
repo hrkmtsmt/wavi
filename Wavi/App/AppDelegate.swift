@@ -26,7 +26,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         windowController?.showWindow(nil)
         NSApp.activate()
         #if DEBUG
-        DebugLaunch.apply(store: store)
+            DebugLaunch.apply(store: store)
         #endif
     }
 

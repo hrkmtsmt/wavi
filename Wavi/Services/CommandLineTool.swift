@@ -55,9 +55,9 @@ enum CommandLineTool {
     }
 }
 
-private extension FileManager {
+extension FileManager {
     /// True when `url` is a symbolic link, even a dangling one.
-    func destinationOfSymbolicLinkExists(_ url: URL) -> Bool {
+    fileprivate func destinationOfSymbolicLinkExists(_ url: URL) -> Bool {
         (try? destinationOfSymbolicLink(atPath: url.path)) != nil
     }
 }

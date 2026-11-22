@@ -18,7 +18,8 @@ struct HelpPanel: View {
                 KeyRow(key: "⌘,", description: strings.settings)
             }
             PanelSection(title: strings.terminal) {
-                (Text("$ wv").bold().foregroundStyle(Palette.ink) + Text(" ./file.txt").foregroundStyle(Palette.inkMuted))
+                Text("\(Text("$ wv").bold().foregroundStyle(Palette.ink)) ./file.txt")
+                    .foregroundStyle(Palette.inkMuted)
                     .textStyle(.mono12)
                 if isCommandInstalled {
                     Text(strings.commandInstalled).textStyle(.mono12).foregroundStyle(Palette.ink)

@@ -70,8 +70,9 @@ final class WaviTextView: NSTextView {
 
     private func drawFullWidthSpaceMarks(in rect: NSRect) {
         guard let layoutManager = textLayoutManager,
-              let contentManager = layoutManager.textContentManager,
-              let viewport = layoutManager.textViewportLayoutController.viewportRange else { return }
+            let contentManager = layoutManager.textContentManager,
+            let viewport = layoutManager.textViewportLayoutController.viewportRange
+        else { return }
         let documentStart = contentManager.documentRange.location
         let start = contentManager.offset(from: documentStart, to: viewport.location)
         let end = contentManager.offset(from: documentStart, to: viewport.endLocation)
@@ -81,10 +82,12 @@ final class WaviTextView: NSTextView {
         let searchRange = NSRange(location: start, length: min(end, string.length) - start)
         guard searchRange.length > 0 else { return }
 
-        let mark = NSAttributedString(string: "□", attributes: [
-            .font: font ?? WaviFont.nsFont(.mono16),
-            .foregroundColor: NSColor(Palette.inkSubtle),
-        ])
+        let mark = NSAttributedString(
+            string: "□",
+            attributes: [
+                .font: font ?? WaviFont.nsFont(.mono16),
+                .foregroundColor: NSColor(Palette.inkSubtle),
+            ])
         let origin = textContainerOrigin
         var location = searchRange.location
         let limit = NSMaxRange(searchRange)
@@ -93,9 +96,10 @@ final class WaviTextView: NSTextView {
             guard found.location != NSNotFound else { break }
             location = NSMaxRange(found)
             guard let from = contentManager.location(documentStart, offsetBy: found.location),
-                  let to = contentManager.location(from, offsetBy: found.length),
-                  let range = NSTextRange(location: from, end: to) else { continue }
-            layoutManager.enumerateTextSegments(in: range, type: .standard, options: []) { _, frame, baseline, _ in
+                let to = contentManager.location(from, offsetBy: found.length),
+                let range = NSTextRange(location: from, end: to)
+            else { continue }
+            layoutManager.enumerateTextSegments(in: range, type: .standard, options: []) { _, frame, _, _ in
                 let box = frame.offsetBy(dx: origin.x, dy: origin.y)
                 guard box.intersects(rect) else { return true }
                 let size = mark.size()
