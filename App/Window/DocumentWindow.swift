@@ -77,6 +77,17 @@ final class DocumentWindowController: NSWindowController, NSWindowDelegate, NSMe
     private func layoutTrafficLights() {
         guard let window, !window.styleMask.contains(.fullScreen) else { return }
         let types: [NSWindow.ButtonType] = [.closeButton, .miniaturizeButton, .zoomButton]
+        // The buttons sit inside the titlebar, which is shorter than the tab bar row. A button moved past its parent's bounds no longer gets clicks, so the titlebar is grown to the bottom of the row first.
+        if let titlebar = window.standardWindowButton(.closeButton)?.superview, let container = titlebar.superview,
+            let frameView = container.superview
+        {
+            let height = Space.s16 + Space.s40
+            if container.frame.height != height {
+                let y = frameView.isFlipped ? 0 : frameView.bounds.height - height
+                container.frame = NSRect(x: container.frame.minX, y: y, width: container.frame.width, height: height)
+                titlebar.frame = container.bounds
+            }
+        }
         var x = Space.s16
         for type in types {
             guard let button = window.standardWindowButton(type), let superview = button.superview else { continue }
