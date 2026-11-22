@@ -1,0 +1,70 @@
+name: Wavi
+options:
+  bundleIdPrefix: com.hrkmtsmt
+  deploymentTarget:
+    macOS: "26.0"
+  createIntermediateGroups: true
+settings:
+  base:
+    SWIFT_VERSION: "6.0"
+    SWIFT_DEFAULT_ACTOR_ISOLATION: MainActor
+    MACOSX_DEPLOYMENT_TARGET: "26.0"
+    MARKETING_VERSION: "1.0"
+    CURRENT_PROJECT_VERSION: "1"
+    DEVELOPMENT_TEAM: ""
+    CODE_SIGN_IDENTITY: "-"
+    CODE_SIGN_STYLE: Manual
+targets:
+  Wavi:
+    type: application
+    platform: macOS
+    sources:
+      - path: App
+        excludes:
+          - "Resources/**"
+          - Info.plist
+      - path: App/Resources/Fonts
+        type: folder
+        buildPhase: resources
+      - path: App/Resources/Licenses
+        type: folder
+        buildPhase: resources
+      - path: App/Resources/wv
+        buildPhase: resources
+    postBuildScripts:
+      - name: Make wv executable
+        basedOnDependencyAnalysis: false
+        script: chmod +x "${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/wv"
+    settings:
+      base:
+        ENABLE_USER_SCRIPT_SANDBOXING: NO
+        PRODUCT_BUNDLE_IDENTIFIER: com.hrkmtsmt.Wavi
+        PRODUCT_NAME: Wavi
+        INFOPLIST_FILE: App/Info.plist
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        ENABLE_HARDENED_RUNTIME: YES
+        # `wv` is installed into /usr/local/bin and default apps are changed system-wide, so the app ships outside the App Store sandbox.
+        ENABLE_APP_SANDBOX: NO
+        COMBINE_HIDPI_IMAGES: YES
+  WaviTests:
+    type: bundle.unit-test
+    platform: macOS
+    sources:
+      - path: Tests
+    dependencies:
+      - target: Wavi
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.hrkmtsmt.WaviTests
+        GENERATE_INFOPLIST_FILE: YES
+        TEST_HOST: "$(BUILT_PRODUCTS_DIR)/Wavi.app/Contents/MacOS/Wavi"
+        BUNDLE_LOADER: "$(TEST_HOST)"
+schemes:
+  Wavi:
+    build:
+      targets:
+        Wavi: all
+        WaviTests: [test]
+    test:
+      targets:
+        - WaviTests

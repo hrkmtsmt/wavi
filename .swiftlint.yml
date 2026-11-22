@@ -1,0 +1,17 @@
+# SwiftLint checks code patterns. Layout is swift-format's job (.swift-format), so rules that fight its output are turned off here.
+included:
+  - App
+  - Tests
+
+disabled_rules:
+  - trailing_comma # swift-format adds trailing commas to multi-line collections
+  - opening_brace # swift-format places braces after wrapped conditions
+
+line_length:
+  warning: 140
+  error: 160
+  ignores_comments: true
+
+identifier_name:
+  # Short names are clearer in a few places: coordinates (x, y), language codes (ja, en), line endings (lf, cr) and token steps (s2, r8).
+  min_length: 1
