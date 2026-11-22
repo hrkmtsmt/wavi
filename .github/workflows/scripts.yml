@@ -1,0 +1,22 @@
+name: Scripts
+
+# Tests the repo scripts. Runs only when they or this workflow change.
+on:
+  push:
+    branches: [main]
+    paths: ["scripts/**", ".github/workflows/scripts.yml"]
+  pull_request:
+    paths: ["scripts/**", ".github/workflows/scripts.yml"]
+
+concurrency:
+  group: scripts-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v7
+      - name: Version bump rules
+        run: scripts/test-next-version.sh
