@@ -1,12 +1,15 @@
-name: CI
+name: App
 
+# Lint, build and test the macOS app. Runs only when the app or this workflow changes.
 on:
   push:
     branches: [main]
+    paths: ["app/**", ".github/workflows/app.yml"]
   pull_request:
+    paths: ["app/**", ".github/workflows/app.yml"]
 
 concurrency:
-  group: ci-${{ github.ref }}
+  group: app-${{ github.ref }}
   cancel-in-progress: true
 
 env:
@@ -15,18 +18,13 @@ env:
   SWIFTLINT_VERSION: 0.65.1
 
 jobs:
-  scripts:
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
-    steps:
-      - uses: actions/checkout@v7
-      - name: Version bump rules
-        run: scripts/test-next-version.sh
-
   check:
     # The Xcode 27 image is in public preview on GitHub-hosted runners.
     runs-on: xcode-27
     timeout-minutes: 30
+    defaults:
+      run:
+        working-directory: app
     steps:
       - uses: actions/checkout@v7
 
@@ -44,7 +42,7 @@ jobs:
           echo "$RUNNER_TEMP/swiftlint" >> "$GITHUB_PATH"
 
       - name: swift-format
-        run: swift format lint --strict --recursive App Tests
+        run: swift format lint --strict --recursive Sources Tests
 
       - name: SwiftLint
         run: swiftlint lint --strict --quiet --reporter github-actions-logging

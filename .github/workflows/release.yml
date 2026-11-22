@@ -1,6 +1,6 @@
 name: Release
 
-# On every push to main, scripts/next-version.sh reads the Conventional Commits since the last vX.Y.Z tag and picks one bump for all of them. Pull requests are rebase-merged, so each one reaches main in a single push and becomes at most one release. When a bump is due, the app is built and a release is published under the new tag with Wavi.zip attached.
+# On every push to main, scripts/next-version.sh reads the Conventional Commits that changed app/ since the last vX.Y.Z tag and picks one bump for all of them; website and tooling commits never version the app. Pull requests are rebase-merged, so each one reaches main in a single push and becomes at most one release. When a bump is due, the app is built and a release is published under the new tag with Wavi.zip attached.
 #
 # Pushing a tag by hand (for example v1.0.0) publishes that version instead.
 on:
@@ -53,6 +53,7 @@ jobs:
         run: sudo xcode-select -s "$XCODE_APP"
 
       - name: Build
+        working-directory: app
         run: |
           brew install xcodegen
           xcodegen generate
@@ -69,7 +70,7 @@ jobs:
       - name: Package
         run: |
           # ditto keeps the bundle's symlinks, permissions and signature intact.
-          ditto -c -k --keepParent build/DerivedData/Build/Products/Release/Wavi.app Wavi.zip
+          ditto -c -k --keepParent app/build/DerivedData/Build/Products/Release/Wavi.app Wavi.zip
           shasum -a 256 Wavi.zip > Wavi.zip.sha256
 
       # The tag is created here, after the build, so a failed build leaves no tag behind. A tag made with GITHUB_TOKEN does not start another run.

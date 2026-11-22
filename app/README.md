@@ -1,4 +1,4 @@
-# Wavi
+# Wavi for macOS
 
 A light text viewer and editor for macOS — for when opening an editor is too much.
 
@@ -32,6 +32,8 @@ Each release also lists `Wavi.zip.sha256`; compare it with `shasum -a 256 Wavi.z
 
 ## Build
 
+Run these in this folder (`app/`):
+
 ```sh
 brew install xcodegen
 xcodegen generate
@@ -42,19 +44,19 @@ Run the tests with `xcodebuild -project Wavi.xcodeproj -scheme Wavi test`.
 
 ## Checks
 
-CI (`.github/workflows/ci.yml`) runs these on every pull request. Run them locally before pushing:
+CI (`.github/workflows/app.yml`) runs these on pull requests that change `app/`. Run them in this folder before pushing:
 
 ```sh
-swift format lint --strict --recursive App Tests        # layout (.swift-format)
+swift format lint --strict --recursive Sources Tests    # layout (.swift-format)
 swiftlint lint --strict                                 # code patterns (.swiftlint.yml)
 xcodebuild -project Wavi.xcodeproj -scheme Wavi test SWIFT_TREAT_WARNINGS_AS_ERRORS=YES
 ```
 
-`swift format format -i --recursive App Tests` fixes layout in place. swift-format ships with Xcode; install SwiftLint with `brew install swiftlint`.
+`swift format format -i --recursive Sources Tests` fixes layout in place. swift-format ships with Xcode; install SwiftLint with `brew install swiftlint`.
 
 ## Release
 
-Pull requests are rebase-merged, and each one becomes at most one release. On each push to `main`, `.github/workflows/release.yml` reads the [Conventional Commits](https://www.conventionalcommits.org/) since the last `vX.Y.Z` tag and applies the largest [semantic version](https://semver.org/) bump among them, once:
+Pull requests are rebase-merged, and each one becomes at most one release. On each push to `main`, `.github/workflows/release.yml` reads the [Conventional Commits](https://www.conventionalcommits.org/) that changed `app/` since the last `vX.Y.Z` tag and applies the largest [semantic version](https://semver.org/) bump among them, once:
 
 | Commit | Release |
 | --- | --- |
@@ -66,7 +68,7 @@ Pull requests are rebase-merged, and each one becomes at most one release. On ea
 
 `release:` is not a Conventional Commits type. It lets a major version ship without a breaking change.
 
-The workflow then builds the app and publishes a GitHub release with `Wavi.zip`, tagging the commit. `scripts/next-version.sh` prints the version it would pick; `scripts/test-next-version.sh` checks these rules. Pushing a `vX.Y.Z` tag by hand also publishes that version.
+The workflow then builds the app and publishes a GitHub release with `Wavi.zip`, tagging the commit. Commits that only change the website or repo tooling never version the app. `scripts/next-version.sh` (at the repo root) prints the version it would pick; `scripts/test-next-version.sh` checks these rules. Pushing a `vX.Y.Z` tag by hand also publishes that version.
 
 ## The `wv` command
 
@@ -80,13 +82,13 @@ wv ./file.txt
 
 | Folder | Contents |
 | --- | --- |
-| `App/Tokens` | Design tokens (spacing, radii, colors, glass levels, type) |
-| `App/Components` | Generic components: GlassSurface, RoundButton, PillButton, Chip, PillGroup, Tab, Switch, KeyRow, InfoItem, Panel, Overlay |
-| `App/Features` | TabBar, StatusBar, HelpPanel, SettingsPanel, DropOverlay, Editor |
-| `App/Window` | DocumentWindow, the only window |
-| `App/Model` | Documents, encoding detection, settings, UI strings |
-| `App/Services` | `wv` installation and default-app settings |
+| `Sources/Tokens` | Design tokens (spacing, radii, colors, glass levels, type) |
+| `Sources/Components` | Generic components: GlassSurface, RoundButton, PillButton, Chip, PillGroup, Tab, Switch, KeyRow, InfoItem, Panel, Overlay |
+| `Sources/Features` | TabBar, StatusBar, HelpPanel, SettingsPanel, DropOverlay, Editor |
+| `Sources/Window` | DocumentWindow, the only window |
+| `Sources/Model` | Documents, encoding detection, settings, UI strings |
+| `Sources/Services` | `wv` installation and default-app settings |
 
 ## Fonts
 
-JetBrains Mono and Gen Jyuu Gothic Monospace are bundled under the SIL Open Font License 1.1. The license texts ship in `App/Resources/Licenses`.
+JetBrains Mono and Gen Jyuu Gothic Monospace are bundled under the SIL Open Font License 1.1. The license texts ship in `Sources/Resources/Licenses`.
