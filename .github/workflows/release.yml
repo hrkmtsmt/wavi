@@ -1,20 +1,55 @@
 name: Release
 
-# Push a tag like v1.0.0 to publish a release with Wavi.zip attached.
+# On every push to main, scripts/next-version.sh reads the Conventional Commits
+# since the last vX.Y.Z tag and picks one bump for all of them. Pull requests
+# are rebase-merged, so each one reaches main in a single push and becomes at
+# most one release. When a bump is due, the app is built and a release is
+# published under the new tag with Wavi.zip attached.
+#
+# Pushing a tag by hand (for example v1.0.0) publishes that version instead.
 on:
   push:
+    branches: [main]
     tags: ["v*"]
 
 permissions:
   contents: write
 
+concurrency:
+  group: release
+  cancel-in-progress: false
+
 env:
   XCODE_APP: /Applications/Xcode_27.1.app
 
 jobs:
+  version:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.next.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # all commits and tags
+
+      - name: Decide the version
+        id: next
+        run: |
+          if [[ "$GITHUB_REF_TYPE" == tag ]]; then
+            version="${GITHUB_REF_NAME#v}"
+          else
+            version="$(scripts/next-version.sh)"
+          fi
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "Next version: ${version:-none, no release}" >> "$GITHUB_STEP_SUMMARY"
+
   release:
+    needs: version
+    if: needs.version.outputs.version != ''
     runs-on: xcode-27
     timeout-minutes: 30
+    env:
+      VERSION: ${{ needs.version.outputs.version }}
     steps:
       - uses: actions/checkout@v4
 
@@ -33,8 +68,8 @@ jobs:
             -configuration Release \
             -destination 'platform=macOS' \
             -derivedDataPath build/DerivedData \
-            MARKETING_VERSION="${GITHUB_REF_NAME#v}" \
-            CURRENT_PROJECT_VERSION="${GITHUB_RUN_NUMBER}"
+            MARKETING_VERSION="$VERSION" \
+            CURRENT_PROJECT_VERSION="$GITHUB_RUN_NUMBER"
 
       - name: Package
         run: |
@@ -42,7 +77,12 @@ jobs:
           ditto -c -k --keepParent build/DerivedData/Build/Products/Release/Wavi.app Wavi.zip
           shasum -a 256 Wavi.zip > Wavi.zip.sha256
 
+      # The tag is created here, after the build, so a failed build leaves no
+      # tag behind. A tag made with GITHUB_TOKEN does not start another run.
       - name: Publish
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh release create "$GITHUB_REF_NAME" Wavi.zip Wavi.zip.sha256 --generate-notes
+        run: |
+          gh release create "v$VERSION" Wavi.zip Wavi.zip.sha256 \
+            --target "$GITHUB_SHA" \
+            --generate-notes

@@ -60,13 +60,27 @@ swift-format ships with Xcode; install SwiftLint with `brew install swiftlint`.
 
 ## Release
 
-Push a version tag. `.github/workflows/release.yml` builds the app, zips it
-and publishes a GitHub release with the zip attached.
+Pull requests are rebase-merged, and each one becomes at most one release. On
+each push to `main`, `.github/workflows/release.yml` reads the
+[Conventional Commits](https://www.conventionalcommits.org/) since the last
+`vX.Y.Z` tag and applies the largest [semantic version](https://semver.org/)
+bump among them, once:
 
-```sh
-git tag v1.0.0
-git push origin v1.0.0
-```
+| Commit | Release |
+| --- | --- |
+| `BREAKING CHANGE:` footer, or `!` after the type (`feat!:`) | major |
+| `release:` | major, on purpose — for example 0.x → 1.0.0 |
+| `feat:` | minor |
+| `fix:`, `security:` | patch |
+| anything else (`chore:`, `docs:`, `refactor:`, …) | none |
+
+`release:` is not a Conventional Commits type. It lets a major version ship
+without a breaking change.
+
+The workflow then builds the app and publishes a GitHub release with
+`Wavi.zip`, tagging the commit. `scripts/next-version.sh` prints the version it
+would pick; `scripts/test-next-version.sh` checks these rules. Pushing a
+`vX.Y.Z` tag by hand also publishes that version.
 
 ## The `wv` command
 

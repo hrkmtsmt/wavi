@@ -16,6 +16,14 @@ env:
   SWIFTLINT_VERSION: 0.65.1
 
 jobs:
+  scripts:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Version bump rules
+        run: scripts/test-next-version.sh
+
   check:
     # The Xcode 27 image is in public preview on GitHub-hosted runners.
     runs-on: xcode-27
