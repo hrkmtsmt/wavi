@@ -19,7 +19,8 @@ struct StatusBar: View {
                 PillButton(
                     title: store.isCopied ? strings.copied : strings.copy,
                     systemImage: store.isCopied ? "checkmark" : "doc.on.doc",
-                    isDone: store.isCopied
+                    isDone: store.isCopied,
+                    reservedTitles: [strings.copy, strings.copied]
                 ) {
                     store.copyAll()
                 }
