@@ -6,6 +6,7 @@ final class DocumentWindowController: NSWindowController, NSWindowDelegate, NSMe
     let store: DocumentStore
     let settings: AppSettings
     private var keyMonitor: Any?
+    private var appearanceObservation: NSKeyValueObservation?
 
     /// The window's default size in the adopted design.
     static let defaultSize = NSSize(width: 900, height: 600)
@@ -55,6 +56,10 @@ final class DocumentWindowController: NSWindowController, NSWindowDelegate, NSMe
 
         if window.frame.origin == .zero { window.center() }
         installKeyMonitor()
+        // Switching the theme makes AppKit lay the titlebar out again, which puts the buttons back at the top. That layout runs after this change is reported, so the buttons are placed again on the next turn of the run loop.
+        appearanceObservation = window.observe(\.effectiveAppearance) { [weak self] _, _ in
+            DispatchQueue.main.async { self?.layoutTrafficLights() }
+        }
     }
 
     @available(*, unavailable)
