@@ -3,12 +3,16 @@ import SwiftUI
 /// HelpPanel = Panel (message / KeyRow x6 / command + PillButton / footer).
 struct HelpPanel: View {
     let strings: Strings
+    let onClose: () -> Void
     @State private var isCommandInstalled = CommandLineTool.isInstalled
     @State private var isInstalling = false
     @State private var failed = false
 
     var body: some View {
-        Panel(title: strings.helpTitle, message: strings.helpMessage) {
+        Panel(
+            title: strings.helpTitle, message: strings.helpMessage,
+            close: PanelClose(accessibilityLabel: strings.closePanel, action: onClose)
+        ) {
             PanelSection(title: strings.shortcuts) {
                 KeyRow(keys: ["⌘", "O"], description: strings.open)
                 KeyRow(keys: ["⌘", "N"], description: strings.new)

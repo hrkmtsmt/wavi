@@ -114,7 +114,7 @@ final class DocumentWindowController: NSWindowController, NSWindowDelegate, NSMe
             guard let self, event.window === self.window else { return event }
             // Esc closes the open panel.
             if event.keyCode == 53, self.store.openPanel != nil {
-                self.store.openPanel = nil
+                self.store.closePanel()
                 return nil
             }
             return event

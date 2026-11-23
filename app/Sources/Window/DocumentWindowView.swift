@@ -51,8 +51,8 @@ struct DocumentWindowView: View {
             if let panel = store.openPanel {
                 Group {
                     switch panel {
-                    case .help: HelpPanel(strings: strings)
-                    case .settings: SettingsPanel(settings: settings, defaultApps: defaultApps)
+                    case .help: HelpPanel(strings: strings) { store.closePanel() }
+                    case .settings: SettingsPanel(settings: settings, defaultApps: defaultApps) { store.closePanel() }
                     }
                 }
                 .frame(maxHeight: .infinity, alignment: .top)

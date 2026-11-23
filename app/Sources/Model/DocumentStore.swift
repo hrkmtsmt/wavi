@@ -168,4 +168,9 @@ final class DocumentStore {
     func toggle(_ panel: OpenPanel) {
         openPanel = openPanel == panel ? nil : panel
     }
+
+    /// Esc, the panel's ×, and a click outside the panel all close it this way.
+    func closePanel() {
+        openPanel = nil
+    }
 }
