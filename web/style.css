@@ -6,6 +6,7 @@
   --ink-muted: #55555a;
   --ink-subtle: #6b6b70;
   --hairline: #e4e4e7;
+  --fill-track: rgba(60, 60, 67, 0.08);
   --mono: "JetBrains Mono", "GenJyuuGothic Monospace", "M PLUS Rounded 1c", monospace;
   --sans: "Noto Sans JP", system-ui, sans-serif;
 }
@@ -429,9 +430,37 @@ a:hover {
   color: #3a3a3c;
 }
 
+.keys > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
 .keys b {
   color: var(--ink);
   font-weight: 700;
+}
+
+/* One cap per key, like the app's KeyCap: at least 24px square, radius 8, track fill, no border. */
+.keys .combo {
+  display: inline-flex;
+  gap: 4px;
+}
+
+.keys kbd {
+  display: inline-grid;
+  place-items: center;
+  box-sizing: border-box;
+  min-width: 24px;
+  height: 24px;
+  padding: 0 4px;
+  border-radius: 8px;
+  background: var(--fill-track);
+  color: var(--ink);
+  font-family: var(--mono);
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 24px;
 }
 
 .keys .sep {
