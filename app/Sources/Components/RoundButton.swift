@@ -24,6 +24,7 @@ struct RoundButton: View {
                 .glassSurface(isSelected ? .ink : level, shape: .capsule, interactive: true)
         }
         .buttonStyle(.plain)
+        .clickable()
         .accessibilityLabel(accessibilityLabel)
         .accessibilityAddTraits(isSelected ? .isSelected : [])
     }

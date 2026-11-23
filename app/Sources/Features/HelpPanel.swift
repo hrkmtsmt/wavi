@@ -34,7 +34,7 @@ struct HelpPanel: View {
         } footer: {
             Text("Wavi \(AppInfo.version)")
             if let site = AppInfo.siteURL {
-                Link(strings.site, destination: site).foregroundStyle(Palette.inkSubtle)
+                Link(strings.site, destination: site).foregroundStyle(Palette.inkSubtle).clickable()
             } else {
                 Text(strings.site)
             }

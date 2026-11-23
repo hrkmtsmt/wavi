@@ -65,6 +65,7 @@ struct PillGroupItem: View {
                 .contentShape(Capsule())
         }
         .buttonStyle(.plain)
+        .clickable()
         .accessibilityAddTraits(isSelected ? .isSelected : [])
         .pillGroupGap()
     }

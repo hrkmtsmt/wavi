@@ -27,6 +27,7 @@ struct PillButton: View {
             .opacity(isEnabled ? 1 : 0.35)
         }
         .buttonStyle(.plain)
+        .clickable()
     }
 
     private func label(_ text: String) -> some View {

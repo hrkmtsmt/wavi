@@ -86,6 +86,7 @@ private struct TabItem: View, Animatable {
                     .contentShape(Rectangle())
             }
             .buttonStyle(.plain)
+            .clickable()
             .accessibilityAddTraits(isSelected ? .isSelected : [])
 
             // Always in the layout: 8 + 16pt button + 8 when shown, nothing when hidden.
@@ -100,6 +101,7 @@ private struct TabItem: View, Animatable {
                     .contentShape(Circle())
             }
             .buttonStyle(.plain)
+            .clickable()
             .padding(.horizontal, Space.s8)
             .frame(width: Space.s32 * closeFraction, alignment: .leading)
             .clipped()
