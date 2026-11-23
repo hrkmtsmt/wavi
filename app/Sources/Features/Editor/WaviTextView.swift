@@ -62,6 +62,27 @@ final class WaviTextView: NSTextView {
         super.concludeDragOperation(sender)
     }
 
+    // The status bar, tab bar and panels are drawn over the text view. AppKit would still show the text cursor across the whole text view, so it is only set where the text view really is the frontmost view; elsewhere the buttons on top set their own pointer.
+
+    private func isCovered(at locationInWindow: NSPoint) -> Bool {
+        guard let frameView = window?.contentView?.superview, let hit = frameView.hitTest(locationInWindow) else { return false }
+        return !hit.isDescendant(of: self)
+    }
+
+    override func resetCursorRects() {
+        // Cursor rects would show the text cursor even under the views on top; cursorUpdate and mouseMoved set it instead.
+    }
+
+    override func cursorUpdate(with event: NSEvent) {
+        if isCovered(at: event.locationInWindow) { return }
+        NSCursor.iBeam.set()
+    }
+
+    override func mouseMoved(with event: NSEvent) {
+        if isCovered(at: event.locationInWindow) { return }
+        super.mouseMoved(with: event)
+    }
+
     override func drawBackground(in rect: NSRect) {
         super.drawBackground(in: rect)
         if showsFullWidthSpace { drawFullWidthSpaceMarks(in: rect) }

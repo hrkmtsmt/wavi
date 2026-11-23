@@ -17,6 +17,7 @@ struct Chip: View {
                 .glassSurface(isOn ? .ink : .bar, shape: .capsule, interactive: true)
         }
         .buttonStyle(.plain)
+        .clickable()
         .accessibilityAddTraits(isOn ? .isSelected : [])
     }
 }

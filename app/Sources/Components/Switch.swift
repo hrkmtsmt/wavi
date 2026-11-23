@@ -16,5 +16,6 @@ struct Switch: View {
                 .foregroundStyle(Palette.ink)
                 .onTapGesture { isOn.toggle() }
         }
+        .clickable()
     }
 }

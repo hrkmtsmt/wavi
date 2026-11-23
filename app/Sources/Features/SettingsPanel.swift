@@ -4,11 +4,12 @@ import SwiftUI
 struct SettingsPanel: View {
     @Bindable var settings: AppSettings
     let defaultApps: DefaultApps
+    let onClose: () -> Void
     @State private var failed = false
 
     var body: some View {
         let strings = settings.strings
-        Panel(title: strings.settings) {
+        Panel(title: strings.settings, close: PanelClose(accessibilityLabel: strings.closePanel, action: onClose)) {
             PanelSection(title: strings.defaultApp) {
                 ChipFlow {
                     ForEach(DefaultApps.extensions, id: \.self) { ext in

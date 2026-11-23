@@ -49,10 +49,18 @@ struct DocumentWindowView: View {
             .padding(.horizontal, Space.s80)
 
             if let panel = store.openPanel {
+                // A click anywhere outside the panel only closes it; nothing underneath reacts. Dragging still moves the window, as the header does when no panel is open.
+                Color.clear
+                    .contentShape(Rectangle())
+                    .ignoresSafeArea()
+                    .gesture(WindowDragGesture())
+                    .onTapGesture { store.closePanel() }
+                    .accessibilityHidden(true)
+
                 Group {
                     switch panel {
-                    case .help: HelpPanel(strings: strings)
-                    case .settings: SettingsPanel(settings: settings, defaultApps: defaultApps)
+                    case .help: HelpPanel(strings: strings) { store.closePanel() }
+                    case .settings: SettingsPanel(settings: settings, defaultApps: defaultApps) { store.closePanel() }
                     }
                 }
                 .frame(maxHeight: .infinity, alignment: .top)

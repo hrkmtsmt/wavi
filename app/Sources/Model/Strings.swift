@@ -25,6 +25,7 @@ struct Strings {
     var releaseToOpen: String { t("離すと開きます", "Release to open") }
     var newTab: String { t("新しいタブ", "New Tab") }
     var closeTab: String { t("タブを閉じる", "Close Tab") }
+    var closePanel: String { t("閉じる", "Close") }
     var openTabs: String { t("開いているファイル", "Open files") }
     var body: String { t("本文", "Text") }
 
