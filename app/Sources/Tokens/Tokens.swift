@@ -122,6 +122,8 @@ enum RaisedShadow {
 nonisolated enum Timing {
     /// How long the "done" state of a PillButton stays.
     static let doneDuration: Duration = .milliseconds(1600)
+    /// Tabs growing in, shrinking away and the raised pill moving to the new selection. Neighbours and the "+" button slide with the same curve.
+    static let tabBar: Animation = .smooth(duration: 0.25)
 }
 
 extension NSColor {
