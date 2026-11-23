@@ -1,19 +1,21 @@
 import SwiftUI
 
-/// A key (bold) on the left and its description on the right. The key column is at least 48pt so descriptions line up.
+/// A shortcut's description on the left and its keys on the right, one KeyCap each, pushed to opposite edges of the row.
 struct KeyRow: View {
-    let key: String
+    let keys: [String]
     let description: String
 
     var body: some View {
-        HStack(alignment: .firstTextBaseline, spacing: Space.s16) {
-            Text(key)
-                .textStyle(.mono12, bold: true)
-                .foregroundStyle(Palette.ink)
-                .frame(minWidth: Space.s48, alignment: .leading)
+        HStack(spacing: Space.s16) {
             Text(description)
                 .textStyle(.mono12)
                 .foregroundStyle(Palette.inkMuted)
+            Spacer(minLength: 0)
+            HStack(spacing: Space.s4) {
+                ForEach(Array(keys.enumerated()), id: \.offset) { _, key in
+                    KeyCap(key: key)
+                }
+            }
         }
     }
 }

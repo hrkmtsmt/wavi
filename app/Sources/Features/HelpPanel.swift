@@ -10,12 +10,12 @@ struct HelpPanel: View {
     var body: some View {
         Panel(title: strings.helpTitle, message: strings.helpMessage) {
             PanelSection(title: strings.shortcuts) {
-                KeyRow(key: "⌘O", description: strings.open)
-                KeyRow(key: "⌘N", description: strings.new)
-                KeyRow(key: "⌘V", description: strings.paste)
-                KeyRow(key: "⌘⇧C", description: strings.copyAll)
-                KeyRow(key: "⌘W", description: strings.closeTab)
-                KeyRow(key: "⌘,", description: strings.settings)
+                KeyRow(keys: ["⌘", "O"], description: strings.open)
+                KeyRow(keys: ["⌘", "N"], description: strings.new)
+                KeyRow(keys: ["⌘", "V"], description: strings.paste)
+                KeyRow(keys: ["⌘", "⇧", "C"], description: strings.copyAll)
+                KeyRow(keys: ["⌘", "W"], description: strings.closeTab)
+                KeyRow(keys: ["⌘", ","], description: strings.settings)
             }
             PanelSection(title: strings.terminal) {
                 Text("\(Text("$ wv").bold().foregroundStyle(Palette.ink)) ./file.txt")
