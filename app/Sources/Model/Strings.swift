@@ -31,7 +31,8 @@ struct Strings {
     // Status bar
     func lines(_ count: Int) -> String { t("\(count) 行", count == 1 ? "1 line" : "\(count) lines") }
     var copy: String { t("コピー", "Copy") }
-    var copied: String { t("コピーしました", "Copied") }
+    /// Same length as `copy` in each language, so the copy button keeps its width and its icon stays put.
+    var copied: String { t("できた", "Done") }
     var readOnly: String { t("読み取り専用", "Read-only") }
     var help: String { t("使い方とショートカット", "Help and shortcuts") }
     var settings: String { t("設定", "Settings") }
