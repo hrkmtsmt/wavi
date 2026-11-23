@@ -19,59 +19,35 @@ struct Tab: View {
     var action: () -> Void = {}
 
     var body: some View {
-        switch kind {
-        case .selected(let onClose):
-            selected(onClose: onClose)
-        case .idle:
-            Button(action: action) {
-                label(bold: false, color: Palette.inkMuted)
-                    .padding(.horizontal, Space.s16)
-                    .frame(height: Space.s32)
-                    .contentShape(Capsule())
-            }
-            .buttonStyle(.plain)
-        case .preview(let detail):
-            preview(detail: detail)
-        }
-    }
-
-    private func label(bold: Bool, color: Color) -> some View {
-        Text(title)
-            .textStyle(.mono12, bold: bold)
-            .foregroundStyle(color)
-            .lineLimit(1)
-            .truncationMode(.middle)
-    }
-
-    private func selected(onClose: (() -> Void)?) -> some View {
-        HStack(spacing: Space.s8) {
-            label(bold: true, color: isPlaceholder ? Palette.inkMuted : Palette.ink)
-            if let onClose {
-                Button(action: onClose) {
-                    Image(systemName: "xmark")
-                        .font(.system(size: Space.s8, weight: .bold))
-                        .foregroundStyle(Palette.inkSubtle)
-                        .frame(width: Space.s16, height: Space.s16)
-                        .background(Palette.fillClose, in: Circle())
-                        .contentShape(Circle())
-                }
-                .buttonStyle(.plain)
-                .accessibilityLabel(closeAccessibilityLabel)
+        Group {
+            if case .preview(let detail) = kind {
+                preview(detail: detail)
+            } else {
+                TabItem(
+                    title: title,
+                    isSelected: isSelected,
+                    isPlaceholder: isPlaceholder,
+                    closeAccessibilityLabel: closeAccessibilityLabel,
+                    onClose: onClose,
+                    action: action,
+                    closeFraction: onClose == nil ? 0 : 1
+                )
             }
         }
-        .padding(.leading, Space.s16)
-        .padding(.trailing, onClose == nil ? Space.s16 : Space.s8)
-        .frame(height: Space.s32)
-        .background { RaisedBackground() }
-        .contentShape(Capsule())
-        .onTapGesture(perform: action)
-        .accessibilityElement(children: .contain)
-        .accessibilityAddTraits(.isSelected)
+        .pillGroupGap()
+    }
+
+    private var isSelected: Bool {
+        if case .selected = kind { true } else { false }
+    }
+
+    private var onClose: (() -> Void)? {
+        if case .selected(let onClose) = kind { onClose } else { nil }
     }
 
     private func preview(detail: String) -> some View {
         HStack(spacing: Space.s8) {
-            label(bold: false, color: Palette.ink)
+            TabTitle(title: title, bold: false, color: Palette.ink)
             Text(detail).textStyle(.mono12, bold: true).foregroundStyle(Palette.ink)
         }
         .padding(.horizontal, Space.s16)
@@ -81,5 +57,75 @@ struct Tab: View {
             Capsule()
                 .strokeBorder(Palette.stateDrop.opacity(0.65), style: StrokeStyle(lineWidth: Space.s2, dash: [Space.s4, Space.s4]))
         }
+    }
+}
+
+/// A selected or idle tab. Both share one layout, so the name stays put and only its weight and color change when the selection moves.
+private struct TabItem: View, Animatable {
+    let title: String
+    let isSelected: Bool
+    let isPlaceholder: Bool
+    let closeAccessibilityLabel: String
+    let onClose: (() -> Void)?
+    let action: () -> Void
+    /// 1 while the close button shows, 0 while it doesn't. Animated, so the tab's width eases with the rest of the bar instead of jumping by the button's width.
+    var closeFraction: CGFloat
+
+    var animatableData: CGFloat {
+        get { closeFraction }
+        set { closeFraction = newValue }
+    }
+
+    var body: some View {
+        HStack(spacing: 0) {
+            Button(action: action) {
+                TabTitle(title: title, bold: isSelected, color: isSelected && !isPlaceholder ? Palette.ink : Palette.inkMuted)
+                    .padding(.leading, Space.s16)
+                    .padding(.trailing, Space.s16 * (1 - closeFraction))
+                    .frame(height: Space.s32)
+                    .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+            .accessibilityAddTraits(isSelected ? .isSelected : [])
+
+            // Always in the layout: 8 + 16pt button + 8 when shown, nothing when hidden.
+            Button {
+                onClose?()
+            } label: {
+                Image(systemName: "xmark")
+                    .font(.system(size: Space.s8, weight: .bold))
+                    .foregroundStyle(Palette.inkSubtle)
+                    .frame(width: Space.s16, height: Space.s16)
+                    .background(Palette.fillClose, in: Circle())
+                    .contentShape(Circle())
+            }
+            .buttonStyle(.plain)
+            .padding(.horizontal, Space.s8)
+            .frame(width: Space.s32 * closeFraction, alignment: .leading)
+            .clipped()
+            .opacity(closeFraction)
+            .allowsHitTesting(onClose != nil)
+            .accessibilityLabel(closeAccessibilityLabel)
+            .accessibilityHidden(onClose == nil)
+        }
+        .raised(isSelected)
+        .accessibilityElement(children: .contain)
+    }
+}
+
+/// A tab's name at 12pt, on one line.
+private struct TabTitle: View {
+    let title: String
+    let bold: Bool
+    let color: Color
+
+    var body: some View {
+        Text(title)
+            .textStyle(.mono12, bold: bold)
+            .foregroundStyle(color)
+            .lineLimit(1)
+            .truncationMode(.middle)
+            // Swap the weight at once: morphing between regular and bold glyphs smears the name while the tab moves.
+            .contentTransition(.identity)
     }
 }
