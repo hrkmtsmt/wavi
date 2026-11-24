@@ -60,6 +60,9 @@ struct Strings {
     var fullWidthSpace: String { t("全角スペース", "Full-width spaces") }
     var showFullWidthSpace: String { t("見せる（□で表示）", "Show (as □)") }
     var hideFullWidthSpace: String { t("見せない", "Hide") }
+    var vimKeys: String { t("Vim キー操作", "Vim keys") }
+    var vimKeysOn: String { t("使う", "On") }
+    var vimKeysOff: String { t("使わない", "Off") }
     var appearance: String { t("外観", "Appearance") }
     var light: String { t("ライト", "Light") }
     var dark: String { t("ダーク", "Dark") }

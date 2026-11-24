@@ -4,9 +4,127 @@ import AppKit
 /// - Leaves file drops to the window, so dropping a file opens it instead of
 ///   inserting its path.
 /// - Optionally marks full-width spaces (U+3000) with a faint "□".
+/// - Optionally takes Vim keys (VimEngine), with a block cursor outside insert mode.
 final class WaviTextView: NSTextView {
     var showsFullWidthSpace = false {
         didSet { if oldValue != showsFullWidthSpace { needsDisplay = true } }
+    }
+
+    // MARK: - Vim keys
+
+    var vimEnabled = false {
+        didSet {
+            guard oldValue != vimEnabled else { return }
+            vim.reset()
+            vimStateChanged()
+        }
+    }
+    /// Called with the mode after every Vim key, and with nil when Vim keys are turned off.
+    var onVimModeChange: (VimMode?) -> Void = { _ in }
+    /// Set while a file is dragged over the window, so no cursor is drawn.
+    var hidesCaretForDrag = false {
+        didSet { if oldValue != hidesCaretForDrag { vimStateChanged() } }
+    }
+    private var vim = VimEngine()
+
+    private var showsBlockCursor: Bool { vimEnabled && vim.mode != .insert && !hidesCaretForDrag }
+
+    override func keyDown(with event: NSEvent) {
+        guard vimEnabled, !hasMarkedText(), let key = Self.vimKey(event) else {
+            super.keyDown(with: event)
+            return
+        }
+        let clipboard = NSPasteboard.general.string(forType: .string)
+        let outcome = vim.handle(key, text: string, selection: selectedRange(), clipboard: clipboard)
+        if outcome.passThrough {
+            super.keyDown(with: event)
+            return
+        }
+        perform(outcome)
+        if !isEditable, vim.mode == .insert { vim.reset() }
+        vimStateChanged()
+    }
+
+    /// The key as Vim reads it, or nil for keys Vim leaves to the text view: ⌘ shortcuts, arrows and other function keys.
+    private static func vimKey(_ event: NSEvent) -> VimKey? {
+        if event.keyCode == 53 { return .escape }
+        if event.modifierFlags.contains(.command) { return nil }
+        let control = event.modifierFlags.contains(.control)
+        guard let characters = control ? event.charactersIgnoringModifiers : event.characters,
+            let scalar = characters.unicodeScalars.first,
+            !(0xF700...0xF8FF).contains(scalar.value)
+        else { return nil }
+        return VimKey(characters, control: control)
+    }
+
+    /// Applies what the engine decided. A command's edits are one undo step, and yanked text goes to the clipboard.
+    private func perform(_ outcome: VimOutcome) {
+        if let yanked = outcome.yanked {
+            NSPasteboard.general.clearContents()
+            NSPasteboard.general.setString(yanked, forType: .string)
+        }
+        switch outcome.history {
+        case .undo: undoManager?.undo()
+        case .redo: undoManager?.redo()
+        case nil: break
+        }
+        if outcome.history != nil {
+            // Undo selects what it restored; in Vim the cursor just goes to its start.
+            let text = VimText(string)
+            setSelectedRange(NSRange(location: text.clampedToLine(text.normalCursor(selectedRange().location)), length: 0))
+        }
+        if !outcome.edits.isEmpty, isEditable, let storage = textStorage {
+            breakUndoCoalescing()
+            undoManager?.beginUndoGrouping()
+            for edit in outcome.edits where NSMaxRange(edit.range) <= storage.length {
+                guard shouldChangeText(in: edit.range, replacementString: edit.replacement) else { continue }
+                storage.replaceCharacters(in: edit.range, with: NSAttributedString(string: edit.replacement, attributes: typingAttributes))
+                didChangeText()
+            }
+            undoManager?.endUndoGrouping()
+        }
+        if let selection = outcome.selection {
+            let length = (string as NSString).length
+            let location = min(selection.location, length)
+            let range = NSRange(location: location, length: min(selection.length, length - location))
+            setSelectedRange(range)
+            scrollRangeToVisible(range)
+        }
+    }
+
+    private func vimStateChanged() {
+        insertionPointColor = showsBlockCursor || hidesCaretForDrag ? .clear : NSColor(Palette.ink)
+        needsDisplay = true
+        onVimModeChange(vimEnabled ? vim.mode : nil)
+    }
+
+    override func setSelectedRanges(_ ranges: [NSValue], affinity: NSSelectionAffinity, stillSelecting: Bool) {
+        super.setSelectedRanges(ranges, affinity: affinity, stillSelecting: stillSelecting)
+        if showsBlockCursor { needsDisplay = true }
+    }
+
+    /// The block over the character at the cursor (or a space's width at the end of a line), drawn behind the text so the character stays readable.
+    private func drawBlockCursor(in rect: NSRect) {
+        let selection = selectedRange()
+        guard selection.length == 0, let layoutManager = textLayoutManager, let contentManager = layoutManager.textContentManager else {
+            return
+        }
+        let text = string as NSString
+        let documentStart = contentManager.documentRange.location
+        guard let start = contentManager.location(documentStart, offsetBy: selection.location) else { return }
+        let atCharacter = selection.location < text.length && !VimText(string).isNewline(at: selection.location)
+        let length = atCharacter ? text.rangeOfComposedCharacterSequence(at: selection.location).length : 0
+        guard let end = contentManager.location(start, offsetBy: length), let range = NSTextRange(location: start, end: end) else { return }
+        let spaceWidth = NSAttributedString(string: " ", attributes: typingAttributes).size().width
+        let origin = textContainerOrigin
+        layoutManager.enumerateTextSegments(in: range, type: .standard, options: []) { _, frame, _, _ in
+            var box = frame.offsetBy(dx: origin.x, dy: origin.y)
+            if !atCharacter { box.size.width = spaceWidth }
+            guard box.intersects(rect) else { return false }
+            NSColor(Palette.ink).withAlphaComponent(0.35).setFill()
+            box.fill()
+            return false
+        }
     }
 
     private static let fileTypes: Set<NSPasteboard.PasteboardType> = [
@@ -98,6 +216,7 @@ final class WaviTextView: NSTextView {
     override func drawBackground(in rect: NSRect) {
         super.drawBackground(in: rect)
         if !highlightedRanges.isEmpty { drawHighlights(in: rect) }
+        if showsBlockCursor { drawBlockCursor(in: rect) }
         if showsFullWidthSpace { drawFullWidthSpaceMarks(in: rect) }
     }
 

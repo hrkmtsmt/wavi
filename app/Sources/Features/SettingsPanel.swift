@@ -28,6 +28,9 @@ struct SettingsPanel: View {
                     label: settings.showsFullWidthSpace ? strings.showFullWidthSpace : strings.hideFullWidthSpace
                 )
             }
+            PanelSection(title: strings.vimKeys) {
+                Switch(isOn: $settings.vimKeys, label: settings.vimKeys ? strings.vimKeysOn : strings.vimKeysOff)
+            }
             PanelSection(title: strings.appearance) {
                 PillGroup(style: .flat) {
                     item(strings.light, .light)

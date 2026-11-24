@@ -22,6 +22,7 @@ final class AppSettings {
         static let showsFullWidthSpace = "showsFullWidthSpace"
         static let appearance = "appearance"
         static let language = "language"
+        static let vimKeys = "vimKeys"
     }
 
     @ObservationIgnored private let defaults: UserDefaults
@@ -41,6 +42,11 @@ final class AppSettings {
         didSet { defaults.set(language.rawValue, forKey: Key.language) }
     }
 
+    /// Vim-style keys in the text. Off unless turned on, since most people expect plain typing.
+    var vimKeys: Bool {
+        didSet { defaults.set(vimKeys, forKey: Key.vimKeys) }
+    }
+
     var strings: Strings { Strings(language: language) }
 
     init(defaults: UserDefaults = .standard) {
@@ -48,6 +54,7 @@ final class AppSettings {
         showsFullWidthSpace = defaults.object(forKey: Key.showsFullWidthSpace) as? Bool ?? true
         appearance = defaults.string(forKey: Key.appearance).flatMap(AppearanceMode.init(rawValue:)) ?? .automatic
         language = defaults.string(forKey: Key.language).flatMap(AppLanguage.init(rawValue:)) ?? .system
+        vimKeys = defaults.bool(forKey: Key.vimKeys)
     }
 
     func applyAppearance() {

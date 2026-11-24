@@ -16,6 +16,9 @@ struct StatusBar: View {
                 if document.isReadOnly {
                     InfoItem(text: strings.readOnly)
                 }
+                if let mode = document.vimMode {
+                    InfoItem(text: mode.label, kind: .value)
+                }
                 PillButton(
                     title: store.isCopied ? strings.copied : strings.copy,
                     systemImage: store.isCopied ? "checkmark" : "doc.on.doc",
