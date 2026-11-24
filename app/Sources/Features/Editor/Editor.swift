@@ -7,6 +7,7 @@ struct Editor: View {
     /// All open tabs, so closed tabs' text views can be released.
     let openDocumentIDs: Set<TextDocument.ID>
     let showsFullWidthSpace: Bool
+    let vimKeys: Bool
     let isDragging: Bool
     let find: FindState
     let strings: Strings
@@ -18,7 +19,8 @@ struct Editor: View {
             let visibleHeight = (proxy.size.height / lineHeight).rounded(.down) * lineHeight
             ZStack(alignment: .topLeading) {
                 EditorTextView(
-                    document: document, openDocumentIDs: openDocumentIDs, showsFullWidthSpace: showsFullWidthSpace, find: find
+                    document: document, openDocumentIDs: openDocumentIDs, showsFullWidthSpace: showsFullWidthSpace, vimKeys: vimKeys,
+                    find: find
                 )
                 .frame(height: visibleHeight)
                 if document.text.isEmpty {
@@ -51,6 +53,7 @@ private struct EditorTextView: NSViewRepresentable {
     let document: TextDocument
     let openDocumentIDs: Set<TextDocument.ID>
     let showsFullWidthSpace: Bool
+    let vimKeys: Bool
     let find: FindState
 
     func makeCoordinator() -> Coordinator { Coordinator() }
@@ -67,6 +70,7 @@ private struct EditorTextView: NSViewRepresentable {
         coordinator.release(keeping: openDocumentIDs)
         let scrollView = coordinator.scrollView(for: document)
         coordinator.textView(for: document)?.showsFullWidthSpace = showsFullWidthSpace
+        coordinator.textView(for: document)?.vimEnabled = vimKeys
         coordinator.hideCaret(context.environment.isDragging)
         if let textView = coordinator.textView(for: document) {
             coordinator.apply(find, to: textView)
@@ -99,6 +103,7 @@ private struct EditorTextView: NSViewRepresentable {
             let scrollView = Self.makeScrollView(for: document)
             if let textView = scrollView.documentView as? WaviTextView {
                 textView.delegate = self
+                textView.onVimModeChange = { [weak document] mode in document?.vimMode = mode }
                 documents[ObjectIdentifier(textView)] = document
                 observers.append(
                     NotificationCenter.default.addObserver(
@@ -125,8 +130,7 @@ private struct EditorTextView: NSViewRepresentable {
 
         func hideCaret(_ hidden: Bool) {
             for scrollView in scrollViews.values {
-                guard let textView = scrollView.documentView as? NSTextView else { continue }
-                textView.insertionPointColor = hidden ? .clear : NSColor(Palette.ink)
+                (scrollView.documentView as? WaviTextView)?.hidesCaretForDrag = hidden
             }
         }
 

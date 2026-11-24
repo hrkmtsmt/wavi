@@ -36,6 +36,7 @@ struct DocumentWindowView: View {
                     document: document,
                     openDocumentIDs: Set(store.documents.map(\.id)),
                     showsFullWidthSpace: settings.showsFullWidthSpace,
+                    vimKeys: settings.vimKeys,
                     isDragging: isDragging,
                     find: store.find,
                     strings: strings
