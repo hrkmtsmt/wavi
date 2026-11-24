@@ -76,6 +76,21 @@ final class FindState {
         if let index = current { current = matches.isEmpty ? nil : min(index, matches.count - 1) }
     }
 
+    /// Vim's n / N and * / #: searches the text again and goes to the first match after (or the last before) `location`, wrapping round.
+    func move(in text: String, from location: Int, backward: Bool) {
+        matches = TextSearch.ranges(of: query, in: text)
+        guard !matches.isEmpty else {
+            current = nil
+            return
+        }
+        if backward {
+            current = matches.lastIndex { $0.location < location } ?? matches.count - 1
+        } else {
+            current = matches.firstIndex { $0.location > location } ?? 0
+        }
+        revealRequest += 1
+    }
+
     func next() {
         guard !matches.isEmpty else { return }
         current = ((current ?? -1) + 1) % matches.count

@@ -39,6 +39,16 @@ nonisolated struct VimEdit: Equatable {
     var replacement: String
 }
 
+/// A search the text view should run with the find bar (/ ? n N * #).
+nonisolated enum VimSearch: Equatable {
+    /// / or ?: open the find bar.
+    case prompt(backward: Bool)
+    /// n or N: go to the next match of the current search.
+    case next(backward: Bool)
+    /// * or #: search for this word.
+    case word(String, backward: Bool)
+}
+
 /// What the text view should do after a key: apply the edits in order, then select `selection`.
 nonisolated struct VimOutcome: Equatable {
     enum History: Equatable {
@@ -51,6 +61,7 @@ nonisolated struct VimOutcome: Equatable {
     /// Text to put on the clipboard (y, d, c, x).
     var yanked: String?
     var history: History?
+    var search: VimSearch?
     /// The key isn't a Vim command here (insert mode); let the text view handle it as typing.
     var passThrough = false
 
@@ -73,6 +84,21 @@ nonisolated struct VimEngine {
     var desiredColumn: Int?
     var visualAnchor = 0
     var visualCursor = 0
+    /// How many lines Ctrl-d and Ctrl-u move; the text view sets it to half of what it shows.
+    var halfPage = 10
+    /// The last f / t / F / T, for ; and ,.
+    var lastCharacterSearch: CharacterSearch?
+    /// Whether the last / ? * # searched backwards, so n keeps the direction and N reverses it.
+    var lastSearchBackward = false
+    /// The keys of the last change, for `.` (see VimEngine+Repeat.swift).
+    var lastChange: [VimKey]?
+    var recording: [VimKey] = []
+    var recordingChanged = false
+    /// True while `.` replays keys: insert mode then types them itself instead of leaving them to the text view.
+    var replaying = false
+
+    /// Whether a command is half typed (a count, an operator or a prefix like g or f).
+    var isPending: Bool { count != nil || pendingOperator != nil || pendingPrefix != nil }
 
     /// Indentation added by >> and >.
     static let indent = "    "
@@ -83,10 +109,24 @@ nonisolated struct VimEngine {
     }
 
     mutating func handle(_ key: VimKey, text: String, selection: NSRange, clipboard: String?) -> VimOutcome {
+        if mode == .normal, pendingOperator == nil, pendingPrefix == nil, key == VimKey(".") {
+            let times = count ?? 1
+            count = nil
+            return repeatLastChange(times: times, text: text, selection: selection, clipboard: clipboard)
+        }
+        let startsCommand = mode == .normal && !isPending
+        let wasVisual = mode.isVisual
+        let outcome = dispatch(key, text: text, selection: selection, clipboard: clipboard)
+        if !replaying { record(key, outcome: outcome, startsCommand: startsCommand, wasVisual: wasVisual) }
+        return outcome
+    }
+
+    /// Handles one key in the current mode.
+    mutating func dispatch(_ key: VimKey, text: String, selection: NSRange, clipboard: String?) -> VimOutcome {
         let text = VimText(text)
         switch mode {
         case .insert:
-            guard key == .escape else { return .passThrough }
+            guard key == .escape else { return replaying ? typed(key, text: text, selection: selection) : .passThrough }
             mode = .normal
             let cursor = selection.location
             let lineStart = text.lineContent(at: cursor).location
@@ -124,11 +164,29 @@ nonisolated struct VimEngine {
             return finishPrefix(prefix, key: key, text: text, cursor: cursor, clipboard: clipboard)
         }
         if key.control {
-            defer { clearPending() }
-            return key.text == "r" ? VimOutcome(history: .redo) : VimOutcome()
+            switch key.text {
+            case "d": return motionOrOperator(.down(halfPage), text: text, cursor: cursor)
+            case "u": return motionOrOperator(.up(halfPage), text: text, cursor: cursor)
+            case "r":
+                clearPending()
+                return VimOutcome(history: .redo)
+            default:
+                clearPending()
+                return VimOutcome()
+            }
         }
-        if let motion = Motion(key: key.text, count: count) {
+        if let motion = Motion(key: key.text, count: count) ?? repeatedCharacterSearch(key.text, text: text, cursor: cursor) {
             return motionOrOperator(motion, text: text, cursor: cursor)
+        }
+        if pendingOperator != nil, key.text == "i" || key.text == "a" {
+            // After an operator, i and a start a text object (diw, ca").
+            pendingPrefix = key.text
+            return VimOutcome()
+        }
+        // g, f, t, F, T (and r, without an operator) wait for one more key.
+        if ["g", "f", "t", "F", "T"].contains(key.text) || (key.text == "r" && pendingOperator == nil) {
+            pendingPrefix = key.text
+            return VimOutcome()
         }
         if let pending = pendingOperator {
             // The operator typed twice (dd, cc, yy, >>, <<) works on whole lines.
@@ -143,10 +201,6 @@ nonisolated struct VimEngine {
             count = nil
             return VimOutcome()
         }
-        if ["g", "r"].contains(key.text) {
-            pendingPrefix = key.text
-            return VimOutcome()
-        }
         defer { count = nil }
         return command(key.text, times: count ?? 1, text: text, cursor: cursor, clipboard: clipboard)
     }
@@ -159,6 +213,20 @@ nonisolated struct VimEngine {
             return replaceCharacters(with: key.text, times: count ?? 1, text: text, cursor: cursor)
         case "g" where key.text == "g":
             return motionOrOperator(.lineNumber(count.map { $0 - 1 } ?? 0), text: text, cursor: cursor)
+        case "f", "t", "F", "T":
+            guard let search = CharacterSearch(prefix: prefix, character: key.text), key != .escape else {
+                clearPending()
+                return VimOutcome()
+            }
+            lastCharacterSearch = search
+            return motionOrOperator(.findCharacter(search, count ?? 1), text: text, cursor: cursor)
+        case "i", "a":
+            defer { clearPending() }
+            guard let pending = pendingOperator, let range = text.textObject(key.text, inner: prefix == "i", at: cursor), range.length > 0
+            else {
+                return VimOutcome()
+            }
+            return apply(pending, to: range, linewise: false, text: text, cursor: cursor)
         default:
             clearPending()
             return VimOutcome()
@@ -184,6 +252,17 @@ nonisolated struct VimEngine {
             return join(lines: max(times, 2) - 1, text: text, cursor: cursor)
         case "u":
             return VimOutcome(history: .undo)
+        case "/", "?":
+            lastSearchBackward = key == "?"
+            return VimOutcome(search: .prompt(backward: lastSearchBackward))
+        case "n", "N":
+            return VimOutcome(search: .next(backward: lastSearchBackward != (key == "N")))
+        case "*", "#":
+            guard let range = text.textObject("w", inner: true, at: cursor), text.characterClass(at: cursor, bigWord: false) == .word else {
+                return VimOutcome()
+            }
+            lastSearchBackward = key == "#"
+            return VimOutcome(search: .word(text.string.substring(with: range), backward: lastSearchBackward))
         case "v", "V":
             mode = key == "v" ? .visual : .visualLine
             visualAnchor = cursor
@@ -252,12 +331,22 @@ nonisolated struct VimEngine {
             }
             var target = cursor
             for _ in 0..<(operatorCount ?? 1) { target = motion.target(from: target, in: text, desiredColumn: nil) }
+            if motion.canFail, target == cursor { return VimOutcome() }
             return apply(pending, motion: motion, from: cursor, to: target, text: text)
         }
         let target = motion.target(from: cursor, in: text, desiredColumn: desiredColumn)
         desiredColumn = motion.keepsColumn ? desiredColumn ?? text.column(of: cursor) : nil
         let landing = motion.isLinewise && !motion.keepsColumn ? text.firstNonBlank(onLineAt: target) : text.clampedToLine(target)
         return .cursor(landing)
+    }
+
+    /// ; and , repeat the last f / t / F / T (, the other way). After t, ; looks past the character right next to the cursor.
+    func repeatedCharacterSearch(_ key: String, text: VimText, cursor: Int) -> Motion? {
+        guard key == ";" || key == ",", let last = lastCharacterSearch else { return nil }
+        let search = key == ";" ? last : last.reversed
+        let n = count ?? 1
+        let found = text.findCharacter(search.character, from: cursor, forward: search.forward, till: search.till, count: n)
+        return .findCharacter(search, found == nil && search.till ? n + 1 : n)
     }
 
     static func toggleCase(_ text: String) -> String {

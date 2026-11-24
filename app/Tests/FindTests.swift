@@ -83,3 +83,20 @@ struct FindStateTests {
         #expect(find.currentRange == nil)
     }
 }
+
+@MainActor
+struct FindStateMoveTests {
+    @Test func movesForwardAndBackwardFromTheCursor() {
+        let find = FindState()
+        find.query = "x"
+        let text = "x x x"
+        find.move(in: text, from: 2, backward: false)
+        #expect(find.currentRange == NSRange(location: 4, length: 1))
+        find.move(in: text, from: 2, backward: true)
+        #expect(find.currentRange == NSRange(location: 0, length: 1))
+        find.move(in: text, from: 4, backward: false)
+        #expect(find.currentRange == NSRange(location: 0, length: 1))
+        find.move(in: text, from: 0, backward: true)
+        #expect(find.currentRange == NSRange(location: 4, length: 1))
+    }
+}
