@@ -104,6 +104,10 @@ private struct EditorTextView: NSViewRepresentable {
             if let textView = scrollView.documentView as? WaviTextView {
                 textView.delegate = self
                 textView.onVimModeChange = { [weak document] mode in document?.vimMode = mode }
+                textView.onVimSearch = { [weak self, weak textView] search in
+                    guard let textView else { return }
+                    self?.runVimSearch(search, in: textView)
+                }
                 documents[ObjectIdentifier(textView)] = document
                 observers.append(
                     NotificationCenter.default.addObserver(
@@ -142,6 +146,7 @@ private struct EditorTextView: NSViewRepresentable {
 
         /// Shows the find bar's state in the text view: every match lightly highlighted, the current one selected and scrolled into view, and the text view focused again once the bar closes.
         func apply(_ find: FindState, to textView: WaviTextView) {
+            self.find = find
             let matches = find.isVisible ? find.matches : []
             let current = find.isVisible ? find.currentRange : nil
             let wanted = FindHighlight(view: ObjectIdentifier(textView), matches: matches, current: current)
@@ -155,7 +160,8 @@ private struct EditorTextView: NSViewRepresentable {
             if find.revealRequest != revealedRequest {
                 revealedRequest = find.revealRequest
                 if let range = find.currentRange, NSMaxRange(range) <= (textView.string as NSString).length {
-                    textView.setSelectedRange(range)
+                    // With Vim keys the cursor goes to the start of the match, as in Vim, instead of selecting it.
+                    textView.setSelectedRange(textView.vimEnabled ? NSRange(location: range.location, length: 0) : range)
                     textView.scrollRangeToVisible(range)
                     textView.showFindIndicator(for: range)
                 }
@@ -164,6 +170,25 @@ private struct EditorTextView: NSViewRepresentable {
                 DispatchQueue.main.async { textView.window?.makeFirstResponder(textView) }
             }
             wasFinding = find.isVisible
+        }
+
+        /// The find bar the text view's / ? n N * # go through; set on every update.
+        private weak var find: FindState?
+
+        private func runVimSearch(_ search: VimSearch, in textView: WaviTextView) {
+            guard let find else { return }
+            let cursor = textView.selectedRange().location
+            switch search {
+            case .prompt:
+                // As with ⌘F: the text view lets go of the keyboard so the find field gets it.
+                textView.window?.makeFirstResponder(nil)
+                find.open(from: cursor)
+            case .next(let backward):
+                find.move(in: textView.string, from: cursor, backward: backward)
+            case .word(let word, let backward):
+                find.query = word
+                find.move(in: textView.string, from: cursor, backward: backward)
+            }
         }
 
         func textViewDidChangeSelection(_ notification: Notification) {

@@ -15,6 +15,12 @@ nonisolated enum Motion {
     /// 0-based; G without a count goes to the last line.
     case lineNumber(Int)
     case lastLine
+    /// f, t, F, T: a character on the current line.
+    case findCharacter(CharacterSearch, Int)
+    /// %: the matching bracket.
+    case matchingBracket
+    /// } and {.
+    case paragraph(forward: Bool, Int)
 
     init?(key: String, count: Int?) {
         let n = count ?? 1
@@ -30,6 +36,8 @@ nonisolated enum Motion {
         case "^": self = .firstNonBlank
         case "$": self = .lineEnd(n)
         case "G": self = count.map { .lineNumber($0 - 1) } ?? .lastLine
+        case "%": self = .matchingBracket
+        case "}", "{": self = .paragraph(forward: key == "}", n)
         default: return nil
         }
     }
@@ -48,10 +56,19 @@ nonisolated enum Motion {
         }
     }
 
-    /// Whether an operator includes the character the motion lands on (e, $).
+    /// Whether an operator includes the character the motion lands on (e, $, f, t, %).
     var isInclusive: Bool {
         switch self {
-        case .wordEnd, .lineEnd: true
+        case .wordEnd, .lineEnd, .matchingBracket: true
+        case .findCharacter(let search, _): search.forward
+        default: false
+        }
+    }
+
+    /// Motions that may find nothing (f, t, %). Then they don't move, and an operator does nothing.
+    var canFail: Bool {
+        switch self {
+        case .findCharacter, .matchingBracket: true
         default: false
         }
     }
@@ -85,6 +102,12 @@ nonisolated enum Motion {
             return text.lineStart(number: max(number, 0))
         case .lastLine:
             return text.lastLineStart
+        case .findCharacter(let search, let n):
+            return text.findCharacter(search.character, from: cursor, forward: search.forward, till: search.till, count: n) ?? cursor
+        case .matchingBracket:
+            return text.matchingBracket(from: cursor) ?? cursor
+        case .paragraph(let forward, let n):
+            return repeated(n, from: cursor) { text.paragraphBoundary(from: $0, forward: forward) }
         }
     }
 
@@ -92,5 +115,27 @@ nonisolated enum Motion {
         var position = start
         for _ in 0..<times { position = step(position) }
         return position
+    }
+}
+
+/// The character search of f / t / F / T, kept so ; and , can repeat it.
+nonisolated struct CharacterSearch: Equatable {
+    var character: String
+    var forward: Bool
+    var till: Bool
+
+    /// , searches the other way.
+    var reversed: CharacterSearch { CharacterSearch(character: character, forward: !forward, till: till) }
+
+    init(character: String, forward: Bool, till: Bool) {
+        self.character = character
+        self.forward = forward
+        self.till = till
+    }
+
+    /// The search a prefix key starts: f, t, F or T.
+    init?(prefix: String, character: String) {
+        guard ["f", "t", "F", "T"].contains(prefix) else { return nil }
+        self.init(character: character, forward: prefix == "f" || prefix == "t", till: prefix == "t" || prefix == "T")
     }
 }
