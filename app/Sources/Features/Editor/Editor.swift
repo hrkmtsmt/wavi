@@ -8,6 +8,7 @@ struct Editor: View {
     let openDocumentIDs: Set<TextDocument.ID>
     let showsFullWidthSpace: Bool
     let isDragging: Bool
+    let find: FindState
     let strings: Strings
 
     var body: some View {
@@ -16,8 +17,10 @@ struct Editor: View {
             let lineHeight = TextStyle.mono16.lineHeight
             let visibleHeight = (proxy.size.height / lineHeight).rounded(.down) * lineHeight
             ZStack(alignment: .topLeading) {
-                EditorTextView(document: document, openDocumentIDs: openDocumentIDs, showsFullWidthSpace: showsFullWidthSpace)
-                    .frame(height: visibleHeight)
+                EditorTextView(
+                    document: document, openDocumentIDs: openDocumentIDs, showsFullWidthSpace: showsFullWidthSpace, find: find
+                )
+                .frame(height: visibleHeight)
                 if document.text.isEmpty {
                     placeholder
                 }
@@ -48,6 +51,7 @@ private struct EditorTextView: NSViewRepresentable {
     let document: TextDocument
     let openDocumentIDs: Set<TextDocument.ID>
     let showsFullWidthSpace: Bool
+    let find: FindState
 
     func makeCoordinator() -> Coordinator { Coordinator() }
 
@@ -64,6 +68,9 @@ private struct EditorTextView: NSViewRepresentable {
         let scrollView = coordinator.scrollView(for: document)
         coordinator.textView(for: document)?.showsFullWidthSpace = showsFullWidthSpace
         coordinator.hideCaret(context.environment.isDragging)
+        if let textView = coordinator.textView(for: document) {
+            coordinator.apply(find, to: textView)
+        }
 
         if scrollView.superview !== container {
             for subview in container.subviews { subview.removeFromSuperview() }
@@ -123,6 +130,45 @@ private struct EditorTextView: NSViewRepresentable {
             }
         }
 
+        // MARK: Find
+
+        private var revealedRequest = 0
+        private var highlighted: FindHighlight?
+        private var wasFinding = false
+
+        /// Shows the find bar's state in the text view: every match lightly highlighted, the current one selected and scrolled into view, and the text view focused again once the bar closes.
+        func apply(_ find: FindState, to textView: WaviTextView) {
+            let matches = find.isVisible ? find.matches : []
+            let current = find.isVisible ? find.currentRange : nil
+            let wanted = FindHighlight(view: ObjectIdentifier(textView), matches: matches, current: current)
+            if highlighted != wanted {
+                for scrollView in scrollViews.values {
+                    (scrollView.documentView as? WaviTextView)?.highlight([], current: nil)
+                }
+                textView.highlight(matches, current: current)
+                highlighted = wanted
+            }
+            if find.revealRequest != revealedRequest {
+                revealedRequest = find.revealRequest
+                if let range = find.currentRange, NSMaxRange(range) <= (textView.string as NSString).length {
+                    textView.setSelectedRange(range)
+                    textView.scrollRangeToVisible(range)
+                    textView.showFindIndicator(for: range)
+                }
+            }
+            if wasFinding, !find.isVisible {
+                DispatchQueue.main.async { textView.window?.makeFirstResponder(textView) }
+            }
+            wasFinding = find.isVisible
+        }
+
+        func textViewDidChangeSelection(_ notification: Notification) {
+            guard let textView = notification.object as? NSTextView,
+                let document = documents[ObjectIdentifier(textView)]
+            else { return }
+            document.cursorLocation = textView.selectedRange().location
+        }
+
         func textDidChange(_ notification: Notification) {
             guard let textView = notification.object as? NSTextView,
                 let document = documents[ObjectIdentifier(textView)]
@@ -151,8 +197,8 @@ private struct EditorTextView: NSViewRepresentable {
             textView.allowsUndo = true
             textView.isEditable = !document.isReadOnly
             textView.isSelectable = true
-            textView.usesFindBar = true
-            textView.isIncrementalSearchingEnabled = true
+            // Wavi draws its own find bar in the middle of the window (FindBar).
+            textView.usesFindBar = false
             textView.drawsBackground = false
             textView.textContainerInset = .zero
             textView.textContainer?.lineFragmentPadding = 0
@@ -210,4 +256,11 @@ extension EnvironmentValues {
         get { self[IsDraggingKey.self] }
         set { self[IsDraggingKey.self] = newValue }
     }
+}
+
+/// What the find highlights were last drawn for, so they are only redrawn when something changed.
+private struct FindHighlight: Equatable {
+    var view: ObjectIdentifier
+    var matches: [NSRange]
+    var current: NSRange?
 }

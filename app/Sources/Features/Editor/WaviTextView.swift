@@ -83,9 +83,57 @@ final class WaviTextView: NSTextView {
         super.mouseMoved(with: event)
     }
 
+    /// The find bar's matches, marked with a faint fill behind the text. Drawn in `drawBackground`, so the text itself, undo and saving never see them.
+    private var highlightedRanges: [NSRange] = []
+    /// The current match, outlined in ink. While the find field has the keyboard the selection is drawn in its inactive gray, so the outline is what tells it apart.
+    private var currentHighlight: NSRange?
+
+    func highlight(_ ranges: [NSRange], current: NSRange?) {
+        guard ranges != highlightedRanges || current != currentHighlight else { return }
+        highlightedRanges = ranges
+        currentHighlight = current
+        needsDisplay = true
+    }
+
     override func drawBackground(in rect: NSRect) {
         super.drawBackground(in: rect)
+        if !highlightedRanges.isEmpty { drawHighlights(in: rect) }
         if showsFullWidthSpace { drawFullWidthSpaceMarks(in: rect) }
+    }
+
+    private func drawHighlights(in rect: NSRect) {
+        guard let layoutManager = textLayoutManager,
+            let contentManager = layoutManager.textContentManager,
+            let viewport = layoutManager.textViewportLayoutController.viewportRange
+        else { return }
+        let documentStart = contentManager.documentRange.location
+        let visibleStart = contentManager.offset(from: documentStart, to: viewport.location)
+        let visibleEnd = contentManager.offset(from: documentStart, to: viewport.endLocation)
+        let origin = textContainerOrigin
+        let fill = NSColor(Palette.fillTrack)
+        let outline = NSColor(Palette.ink)
+        // Matches are in order, so only the ones overlapping the laid-out part of the text are drawn.
+        for range in highlightedRanges where NSMaxRange(range) >= visibleStart {
+            if range.location > visibleEnd { break }
+            guard let start = contentManager.location(documentStart, offsetBy: range.location),
+                let end = contentManager.location(start, offsetBy: range.length),
+                let textRange = NSTextRange(location: start, end: end)
+            else { continue }
+            let isCurrent = range == currentHighlight
+            layoutManager.enumerateTextSegments(in: textRange, type: .standard, options: []) { _, frame, _, _ in
+                let box = frame.offsetBy(dx: origin.x, dy: origin.y)
+                guard box.intersects(rect) else { return true }
+                fill.setFill()
+                box.fill()
+                if isCurrent {
+                    outline.setStroke()
+                    let path = NSBezierPath(rect: box.insetBy(dx: 0.5, dy: 0.5))
+                    path.lineWidth = 1
+                    path.stroke()
+                }
+                return true
+            }
+        }
     }
 
     private func drawFullWidthSpaceMarks(in rect: NSRect) {

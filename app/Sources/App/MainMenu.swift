@@ -63,15 +63,9 @@ enum MainMenu {
         menu.addItem(item(s.pasteMenu, #selector(NSText.paste(_:)), "v"))
         menu.addItem(item(s.selectAll, #selector(NSText.selectAll(_:)), "a"))
         menu.addItem(.separator())
-        let find = item(s.find, #selector(NSTextView.performFindPanelAction(_:)), "f")
-        find.tag = Int(NSFindPanelAction.showFindPanel.rawValue)
-        menu.addItem(find)
-        let next = item(s.findNext, #selector(NSTextView.performFindPanelAction(_:)), "g")
-        next.tag = Int(NSFindPanelAction.next.rawValue)
-        menu.addItem(next)
-        let previous = item(s.findPrevious, #selector(NSTextView.performFindPanelAction(_:)), "g", [.command, .shift])
-        previous.tag = Int(NSFindPanelAction.previous.rawValue)
-        menu.addItem(previous)
+        menu.addItem(item(s.find, #selector(DocumentWindowController.showFind(_:)), "f"))
+        menu.addItem(item(s.findNext, #selector(DocumentWindowController.findNextMatch(_:)), "g"))
+        menu.addItem(item(s.findPrevious, #selector(DocumentWindowController.findPreviousMatch(_:)), "g", [.command, .shift]))
         return menu
     }
 

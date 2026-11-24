@@ -112,6 +112,7 @@ final class DocumentWindowController: NSWindowController, NSWindowDelegate, NSMe
     private func installKeyMonitor() {
         keyMonitor = NSEvent.addLocalMonitorForEvents(matching: .keyDown) { [weak self] event in
             guard let self, event.window === self.window else { return event }
+            if self.store.find.isVisible, let reply = self.handleFindKey(event) { return reply }
             // Esc closes the open panel.
             if event.keyCode == 53, self.store.openPanel != nil {
                 self.store.closePanel()
@@ -121,7 +122,36 @@ final class DocumentWindowController: NSWindowController, NSWindowDelegate, NSMe
         }
     }
 
+    /// While the find bar is open: Esc closes it, and Return / Shift-Return in its field go to the next / previous match. Returns nil for a key it used up, or no reply to let the key through.
+    private func handleFindKey(_ event: NSEvent) -> NSEvent?? {
+        let find = store.find
+        if event.keyCode == 53 {
+            find.close()
+            return .some(nil)
+        }
+        let isReturn = event.keyCode == 36 || event.keyCode == 76
+        guard isReturn, let field = window?.firstResponder as? NSTextView, field.isFieldEditor else { return nil }
+        // Return that confirms Japanese input belongs to the input method, not to the find bar.
+        guard !field.hasMarkedText() else { return nil }
+        if event.modifierFlags.contains(.shift) { find.previous() } else { find.next() }
+        return .some(nil)
+    }
+
     // MARK: - Menu actions (reached through the responder chain)
+
+    @objc func showFind(_ sender: Any?) {
+        // The text view holds the keyboard as an AppKit view, and SwiftUI focus can't take it from there; let it go first so the find field gets the typing.
+        window?.makeFirstResponder(nil)
+        store.find.open(from: store.selected.cursorLocation)
+    }
+
+    @objc func findNextMatch(_ sender: Any?) {
+        store.find.next()
+    }
+
+    @objc func findPreviousMatch(_ sender: Any?) {
+        store.find.previous()
+    }
 
     @objc func newDocument(_ sender: Any?) {
         store.newTab()
@@ -176,6 +206,7 @@ final class DocumentWindowController: NSWindowController, NSWindowDelegate, NSMe
         case #selector(copyAllText(_:)): !store.selected.text.isEmpty
         case #selector(saveDocument(_:)), #selector(saveDocumentAs(_:)): !store.selected.isReadOnly
         case #selector(selectNextTab(_:)), #selector(selectPreviousTab(_:)): store.documents.count > 1
+        case #selector(findNextMatch(_:)), #selector(findPreviousMatch(_:)): !store.find.matches.isEmpty
         default: true
         }
     }
