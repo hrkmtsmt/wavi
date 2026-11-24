@@ -44,7 +44,8 @@ final class DocumentWindowController: NSWindowController, NSWindowDelegate, NSMe
         hosting.onDrop = { [weak store] urls in store?.open(urls) }
 
         let glass = NSGlassEffectView()
-        glass.cornerRadius = Radius.r24
+        // The OS gives a titled window without a toolbar 16pt corners (measured on macOS 26); the glass follows them so the window reads as a standard one.
+        glass.cornerRadius = Radius.r16
         // Lean the material toward paper so body text stays legible on any desktop.
         glass.tintColor = NSColor(Palette.paper).withAlphaComponent(0.6)
         glass.contentView = hosting
