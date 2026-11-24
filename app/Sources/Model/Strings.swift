@@ -110,6 +110,8 @@ struct Strings {
     var find: String { t("検索…", "Find…") }
     var findNext: String { t("次を検索", "Find Next") }
     var findPrevious: String { t("前を検索", "Find Previous") }
+    var findPlaceholder: String { t("検索", "Find") }
+    var noMatches: String { t("見つかりません", "No matches") }
     var view: String { t("表示", "View") }
     var window: String { t("ウインドウ", "Window") }
     var minimize: String { t("しまう", "Minimize") }

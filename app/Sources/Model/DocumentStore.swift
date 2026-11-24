@@ -24,6 +24,7 @@ final class DocumentStore {
     var openPanel: OpenPanel?
     private(set) var dragPreview: DragPreview?
     private(set) var isCopied = false
+    let find = FindState()
 
     @ObservationIgnored var presentMessage: (String) -> Void = { _ in }
     @ObservationIgnored var strings: () -> Strings = { Strings(language: .system) }

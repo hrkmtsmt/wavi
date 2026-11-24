@@ -37,6 +37,7 @@ struct DocumentWindowView: View {
                     openDocumentIDs: Set(store.documents.map(\.id)),
                     showsFullWidthSpace: settings.showsFullWidthSpace,
                     isDragging: isDragging,
+                    find: store.find,
                     strings: strings
                 )
                 .padding(.vertical, bodyGap)
@@ -70,11 +71,18 @@ struct DocumentWindowView: View {
                 .transition(.opacity)
             }
 
+            if store.find.isVisible {
+                FindBar(find: store.find, document: document, strings: strings)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .transition(.opacity)
+            }
+
             DropOverlay(isVisible: isDragging)
         }
         .environment(\.isDragging, isDragging)
         .animation(.easeOut(duration: 0.15), value: isDragging)
         .animation(.easeOut(duration: 0.15), value: store.openPanel)
+        .animation(.easeOut(duration: 0.15), value: store.find.isVisible)
         .frame(minWidth: 640, minHeight: 400)
         // Measure from the window's edge, not below the (hidden) title bar.
         .ignoresSafeArea()

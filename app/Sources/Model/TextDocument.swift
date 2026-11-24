@@ -14,6 +14,8 @@ final class TextDocument: Identifiable {
 
     private(set) var byteCount = 0
     private(set) var lineCount = 0
+    /// Where the cursor is (UTF-16 offset), so the find bar can start searching from it. Not observed: moving the cursor redraws nothing.
+    @ObservationIgnored var cursorLocation = 0
 
     /// The text exactly as it is, line endings included.
     var text: String {
