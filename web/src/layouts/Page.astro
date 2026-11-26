@@ -1,0 +1,40 @@
+---
+import { getAbsoluteLocaleUrl, getRelativeLocaleUrl } from "astro:i18n";
+import { Home } from "../components/Home";
+import { copy, locales, type Locale } from "../i18n";
+import "../styles/global.css";
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const text = copy[locale];
+const other = locales.find((l) => l !== locale) ?? locale;
+---
+
+<!doctype html>
+<html lang={locale}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="light dark" />
+    <title>{text.title}</title>
+    <meta name="description" content={text.description} />
+    {
+      locales.map((l) => (
+        <link rel="alternate" hreflang={l} href={Astro.site ? getAbsoluteLocaleUrl(l) : getRelativeLocaleUrl(l)} />
+      ))
+    }
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <!-- Gen Jyuu Gothic Monospace isn't served on the web, so M PLUS Rounded 1c stands in for Japanese in the mono stack (SPEC 4, 8). -->
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;700&family=JetBrains+Mono:wght@400;500;700&family=Noto+Sans+JP:wght@400;500&display=swap"
+    />
+  </head>
+  <body>
+    <Home copy={text} otherLanguageHref={getRelativeLocaleUrl(other)} />
+  </body>
+</html>

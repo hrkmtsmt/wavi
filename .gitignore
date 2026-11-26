@@ -13,3 +13,9 @@ SPEC.md
 
 # Local preview server for the Browser pane
 .claude/launch.json
+
+# Website (Astro)
+web/node_modules/
+web/dist/
+web/.astro/
+web/.wrangler/
