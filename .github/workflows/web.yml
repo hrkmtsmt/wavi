@@ -1,6 +1,7 @@
 name: Web
 
-# Publishes web/ to GitHub Pages (https://hrkmtsmt.github.io/wavi/). Runs only when the site or this workflow changes. Pull requests only check that the site packages; main deploys it.
+# Builds the Astro site in web/ and deploys it to Cloudflare Workers static assets on https://wavi.hrkmtsmt.dev (web/wrangler.jsonc). Runs only when the site or this workflow changes. Pull requests only check that it builds; main deploys it.
+# Needs the repository secrets CLOUDFLARE_API_TOKEN (allowed to deploy Workers and their custom domains) and CLOUDFLARE_ACCOUNT_ID.
 on:
   push:
     branches: [main]
@@ -20,27 +21,27 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: web
     steps:
       - uses: actions/checkout@v7
-      - uses: actions/configure-pages@v6
-        if: github.event_name != 'pull_request'
-      # The site is plain HTML and CSS, so web/ is published as is.
-      - uses: actions/upload-pages-artifact@v5
+      - uses: actions/setup-node@v7
         with:
-          path: web
+          node-version-file: web/.node-version
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - run: npm ci
+      - run: npx astro check
+      - run: npm run build
 
-  deploy:
-    needs: build
-    if: github.event_name != 'pull_request'
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
-    permissions:
-      pages: write
-      id-token: write
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
-      - id: deployment
-        uses: actions/deploy-pages@v5
+      - name: Deploy to Cloudflare
+        if: github.event_name != 'pull_request'
+        uses: cloudflare/wrangler-action@v4
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          workingDirectory: web
+          wranglerVersion: "4.168.0"
+          command: deploy
