@@ -1,0 +1,14 @@
+// Cloudflare Workers static assets: serves the built site (dist/) as is, with no Worker code, on the custom domain wavi.hrkmtsmt.dev.
+// Deploying creates the domain's DNS record and certificate (hrkmtsmt.dev's DNS is on Cloudflare). .github/workflows/web.yml deploys from main.
+// https://developers.cloudflare.com/workers/static-assets/binding/
+// https://developers.cloudflare.com/workers/configuration/routing/custom-domains/
+{
+  "name": "wavi-web",
+  "compatibility_date": "2026-11-24",
+  "assets": {
+    "directory": "./dist"
+  },
+  "routes": [{ "pattern": "wavi.hrkmtsmt.dev", "custom_domain": true }],
+  // Only the custom domain serves the site, not the default *.workers.dev address.
+  "workers_dev": false
+}

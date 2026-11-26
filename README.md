@@ -13,7 +13,7 @@ Download it from the [latest release](https://github.com/hrkmtsmt/wavi/releases/
 | Folder | Contents |
 | --- | --- |
 | [`app/`](app/) | The macOS app (Swift, SwiftUI and AppKit). Build, checks and releases are in [app/README.md](app/README.md). |
-| [`web/`](web/) | The website, plain HTML and CSS, published to [hrkmtsmt.github.io/wavi](https://hrkmtsmt.github.io/wavi/). |
+| [`web/`](web/) | The website (Astro and React, static, Japanese and English) at [wavi.hrkmtsmt.dev](https://wavi.hrkmtsmt.dev), served by Cloudflare. See [web/README.md](web/README.md). |
 | [`scripts/`](scripts/) | Repo tooling, such as picking the app's next version from commits. |
 | [`.github/workflows/`](.github/workflows/) | `app.yml`, `web.yml` and `scripts.yml` run only when their folder changes; `web.yml` deploys the site from `main`, and `release.yml` publishes the app. |
 
