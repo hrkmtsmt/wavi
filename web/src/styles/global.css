@@ -62,7 +62,7 @@ a:hover {
   gap: 8px;
   text-decoration: none;
   font-family: var(--mono);
-  font-size: 20px;
+  font-size: 16px;
   line-height: 32px;
   font-weight: 700;
 }
