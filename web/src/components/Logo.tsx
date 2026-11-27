@@ -22,3 +22,23 @@ export function Logo({ size }: { size: number }) {
     </svg>
   );
 }
+
+if (import.meta.vitest) {
+  const { describe, expect, it } = import.meta.vitest;
+  const { render } = await import("@testing-library/react");
+
+  describe("Logo", () => {
+    it.each([16, 32, 180])("draws at %ipx, hidden from screen readers", (size) => {
+      const { container } = render(<Logo size={size} />);
+      const svg = container.querySelector("svg");
+      expect(svg?.getAttribute("width")).toBe(String(size));
+      expect(svg?.getAttribute("height")).toBe(String(size));
+      expect(svg?.getAttribute("aria-hidden")).toBe("true");
+    });
+
+    it("stands alone as an SVG file, for the favicon", () => {
+      const { container } = render(<Logo size={32} />);
+      expect(container.querySelector("svg")?.getAttribute("xmlns")).toBe("http://www.w3.org/2000/svg");
+    });
+  });
+}

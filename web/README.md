@@ -16,11 +16,14 @@ npm ci
 npm run dev      # http://localhost:4321
 npm run build    # writes dist/
 npx astro check  # type check
+npm test         # component tests
 ```
+
+Each component is one file in `src/components/`, and its tests sit at the end of the same file in an `if (import.meta.vitest)` block ([Vitest in-source testing](https://vitest.dev/guide/in-source)). They render the component into jsdom with Testing Library. The build defines `import.meta.vitest` as `undefined` (`astro.config.mjs`), so the tests never reach the site.
 
 ## Deploy
 
-`.github/workflows/web.yml` builds the site on every pull request that touches `web/`, and on `main` deploys `dist/` to Cloudflare Workers static assets at https://wavi.hrkmtsmt.dev (`wrangler.jsonc`, a Workers custom domain on the `hrkmtsmt.dev` zone). The first deploy creates the domain's DNS record and certificate.
+`.github/workflows/web.yml` type-checks, tests and builds the site on every pull request that touches `web/`, and on `main` deploys `dist/` to Cloudflare Workers static assets at https://wavi.hrkmtsmt.dev (`wrangler.jsonc`, a Workers custom domain on the `hrkmtsmt.dev` zone). The first deploy creates the domain's DNS record and certificate.
 
 The workflow needs two repository secrets: `CLOUDFLARE_API_TOKEN`, a token allowed to deploy Workers and their custom domains, and `CLOUDFLARE_ACCOUNT_ID`.
 

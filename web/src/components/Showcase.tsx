@@ -1,4 +1,6 @@
 import type { Copy } from "../i18n";
+import { Gear } from "./Gear";
+import { TrafficLights } from "./TrafficLights";
 
 const files = [
   { name: "webhook-event.json", size: "18.6 KB", picked: true },
@@ -84,21 +86,28 @@ export function Showcase({ copy }: { copy: Copy }) {
   );
 }
 
-function TrafficLights() {
-  return (
-    <>
-      <span className="dot red" />
-      <span className="dot yellow" />
-      <span className="dot green" />
-    </>
-  );
-}
+if (import.meta.vitest) {
+  const { describe, expect, it } = import.meta.vitest;
+  const { render, screen } = await import("@testing-library/react");
+  const { copy } = await import("../i18n");
 
-function Gear() {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <circle cx="12" cy="12" r="3" />
-      <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
-    </svg>
-  );
+  describe("Showcase", () => {
+    it("is one picture, described by its label", () => {
+      render(<Showcase copy={copy.ja} />);
+      expect(screen.getByRole("img").getAttribute("aria-label")).toBe(copy.ja.showcaseLabel);
+    });
+
+    it("hides the drawing inside from screen readers", () => {
+      const { container } = render(<Showcase copy={copy.en} />);
+      const parts = [...container.querySelectorAll(".showcase > *")];
+      expect(parts.length).toBeGreaterThan(0);
+      expect(parts.every((part) => part.getAttribute("aria-hidden") === "true")).toBe(true);
+    });
+
+    it("shows webhook-event.json picked in Finder and Wavi asking to release it", () => {
+      const { container } = render(<Showcase copy={copy.en} />);
+      expect(container.querySelector(".finder-files .picked")?.textContent).toBe("webhook-event.json18.6 KB");
+      expect(container.querySelector(".wavi-release")?.textContent).toBe("Release to open");
+    });
+  });
 }
