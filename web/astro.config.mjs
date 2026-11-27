@@ -7,6 +7,8 @@ export default defineConfig({
   // Served from the root of its own domain on Cloudflare (wrangler.jsonc); `site` makes the language alternates full URLs.
   site: "https://wavi.hrkmtsmt.dev",
   integrations: [react()],
+  // In-source tests sit in `if (import.meta.vitest)` blocks; defining it as undefined lets the build drop them (https://vitest.dev/guide/in-source).
+  vite: { define: { "import.meta.vitest": "undefined" } },
   i18n: {
     // Japanese at /, English at /en/.
     defaultLocale: "ja",
