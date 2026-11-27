@@ -16,6 +16,12 @@ export type Copy = {
   copy: string;
   keys: { open: string; paste: string; copyAll: string };
   footerNote: string;
+  /** The header toggle's accessible name; aria-pressed says whether dark is on. */
+  darkMode: string;
+  /** Describes /og.png, the social preview image, which is the same for every language. */
+  ogImageAlt: string;
+  /** The Open Graph locale, e.g. ja_JP. */
+  ogLocale: string;
   /** The link to the other language, written in that language. */
   otherLanguage: string;
 };
@@ -36,6 +42,9 @@ export const copy: Record<Locale, Copy> = {
     copy: "コピー",
     keys: { open: "開く", paste: "貼り付け", copyAll: "全部コピー" },
     footerNote: "Wavi — ワビとも、ウェイビーとも。",
+    darkMode: "ダークモード",
+    ogImageAlt: "Wavi のアイコンと、Wavi の文字",
+    ogLocale: "ja_JP",
     otherLanguage: "English",
   },
   en: {
@@ -53,6 +62,9 @@ export const copy: Record<Locale, Copy> = {
     copy: "Copy",
     keys: { open: "Open", paste: "Paste", copyAll: "Copy all" },
     footerNote: "Wavi — say “wabi” or “wavy”.",
+    darkMode: "Dark mode",
+    ogImageAlt: "The Wavi icon and the word Wavi",
+    ogLocale: "en_US",
     otherLanguage: "日本語",
   },
 };
