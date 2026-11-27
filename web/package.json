@@ -10,6 +10,8 @@
   },
   "dependencies": {
     "@astrojs/react": "7.1.9",
+    "@heroicons/react": "2.2.0",
+    "@primer/octicons-react": "19.43.0",
     "astro": "7.4.13",
     "react": "19.3.1",
     "react-dom": "19.3.1"

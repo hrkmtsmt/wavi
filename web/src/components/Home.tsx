@@ -1,3 +1,5 @@
+import { ArrowDownTrayIcon, GlobeAltIcon, MoonIcon, SunIcon } from "@heroicons/react/16/solid";
+import { MarkGithubIcon } from "@primer/octicons-react";
 import { Fragment } from "react";
 import type { Copy } from "../i18n";
 import { Logo } from "./Logo";
@@ -23,7 +25,7 @@ export function Home({ copy, otherLanguageHref }: { copy: Copy; otherLanguageHre
 
 const repository = "https://github.com/hrkmtsmt/wavi";
 
-/** Icon + "Wavi" on the left; the GitHub link, the language link and the light/dark toggle on the right. */
+/** Icon + "Wavi" on the left; the GitHub link, the language link and the light/dark toggle on the right, as 32px icon buttons. UI icons are Heroicons' 16px "micro" set, drawn for that size. */
 function Header({ copy, otherLanguageHref }: { copy: Copy; otherLanguageHref: string }) {
   return (
     <header className="header">
@@ -32,8 +34,9 @@ function Header({ copy, otherLanguageHref }: { copy: Copy; otherLanguageHref: st
         <span>Wavi</span>
       </a>
       <div className="header-end">
-        <a className="header-link" href={repository}>
-          GitHub
+        {/* GitHub's own mark from Octicons, in the page's ink, as GitHub's logo guidelines allow for a link to GitHub: https://brand.github.com/foundations/logo */}
+        <a className="icon-button" href={repository} aria-label="GitHub" title="GitHub">
+          <MarkGithubIcon size={16} aria-hidden="true" />
         </a>
         <LanguageLink copy={copy} href={otherLanguageHref} />
         <ThemeToggle copy={copy} />
@@ -47,11 +50,7 @@ function LanguageLink({ copy, href }: { copy: Copy; href: string }) {
   const other = copy.lang === "ja" ? "en" : "ja";
   return (
     <a className="icon-button" href={href} hrefLang={other} lang={other} aria-label={copy.otherLanguage} title={copy.otherLanguage}>
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-        <circle cx="12" cy="12" r="9" />
-        <path d="M3 12h18" />
-        <path d="M12 3c2.5 2.5 3.8 5.5 3.8 9s-1.3 6.5-3.8 9c-2.5-2.5-3.8-5.5-3.8-9S9.5 5.5 12 3z" />
-      </svg>
+      <GlobeAltIcon width={16} height={16} />
     </a>
   );
 }
@@ -60,13 +59,8 @@ function LanguageLink({ copy, href }: { copy: Copy; href: string }) {
 function ThemeToggle({ copy }: { copy: Copy }) {
   return (
     <button type="button" className="icon-button theme-toggle" aria-label={copy.darkMode} aria-pressed="false" hidden>
-      <svg className="moon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-        <path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z" />
-      </svg>
-      <svg className="sun" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-        <circle cx="12" cy="12" r="4" />
-        <path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4" />
-      </svg>
+      <MoonIcon className="moon" width={16} height={16} />
+      <SunIcon className="sun" width={16} height={16} />
     </button>
   );
 }
@@ -87,11 +81,7 @@ function Hero({ copy }: { copy: Copy }) {
       </p>
       {/* Always the latest release's Wavi.zip; release.yml attaches it under this name every time. */}
       <a className="download" href={`${repository}/releases/latest/download/Wavi.zip`}>
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-          <path d="M12 4v11" />
-          <path d="M7.5 10.5L12 15l4.5-4.5" />
-          <path d="M5 19h14" />
-        </svg>
+        <ArrowDownTrayIcon width={16} height={16} />
         {copy.download}
       </a>
     </section>

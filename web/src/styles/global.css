@@ -67,22 +67,14 @@ a:hover {
   font-weight: 700;
 }
 
-.header-link {
-  font-family: var(--mono);
-  font-size: 16px;
-  line-height: 24px;
-  text-decoration: none;
-  color: var(--ink-muted);
-}
-
-/* 8px between items: each icon button already has 8px of space around its 16px icon, so the icons don't drift apart. */
+/* 8px between the icon buttons, on top of the 8px around each 16px icon. */
 .header-end {
   display: flex;
   align-items: center;
   gap: 8px;
 }
 
-/* The 32px round buttons in the header: the language link and the light/dark toggle. */
+/* The 32px round buttons in the header: the GitHub link, the language link and the light/dark toggle. */
 .icon-button {
   width: 32px;
   height: 32px;
