@@ -44,7 +44,7 @@ a:hover {
   color: var(--ink-muted);
 }
 
-/* Header: icon + "Wavi" on the left; the GitHub link and the light/dark toggle on the right. */
+/* Header: icon + "Wavi" on the left; the GitHub link, the language link and the light/dark toggle on the right. */
 .header {
   max-width: 1120px;
   margin: 0 auto;
@@ -75,14 +75,15 @@ a:hover {
   color: var(--ink-muted);
 }
 
+/* 8px between items: each icon button already has 8px of space around its 16px icon, so the icons don't drift apart. */
 .header-end {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 8px;
 }
 
-/* Hidden in the HTML and shown by the script in Page.astro, so a page without JavaScript has no dead button. */
-.theme-toggle {
+/* The 32px round buttons in the header: the language link and the light/dark toggle. */
+.icon-button {
   width: 32px;
   height: 32px;
   padding: 0;
@@ -95,16 +96,17 @@ a:hover {
   cursor: pointer;
 }
 
+/* Hidden in the HTML and shown by the script in Page.astro, so a page without JavaScript has no dead button. */
 .theme-toggle[hidden] {
   display: none;
 }
 
-.theme-toggle:hover {
+.icon-button:hover {
   background: var(--fill-track);
   color: var(--ink);
 }
 
-.theme-toggle:focus-visible {
+.icon-button:focus-visible {
   outline: 2px solid var(--ink);
   outline-offset: 2px;
 }

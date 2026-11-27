@@ -7,7 +7,7 @@ import { Showcase } from "./Showcase";
 export function Home({ copy, otherLanguageHref }: { copy: Copy; otherLanguageHref: string }) {
   return (
     <>
-      <Header copy={copy} />
+      <Header copy={copy} otherLanguageHref={otherLanguageHref} />
       <main>
         <Hero copy={copy} />
         {/* A still for now; SPEC 8 swaps it for a short screen recording of the real app later. */}
@@ -23,8 +23,8 @@ export function Home({ copy, otherLanguageHref }: { copy: Copy; otherLanguageHre
 
 const repository = "https://github.com/hrkmtsmt/wavi";
 
-/** Icon + "Wavi" on the left; the GitHub link and the light/dark toggle on the right. */
-function Header({ copy }: { copy: Copy }) {
+/** Icon + "Wavi" on the left; the GitHub link, the language link and the light/dark toggle on the right. */
+function Header({ copy, otherLanguageHref }: { copy: Copy; otherLanguageHref: string }) {
   return (
     <header className="header">
       <a className="logo" href="#top">
@@ -35,16 +35,31 @@ function Header({ copy }: { copy: Copy }) {
         <a className="header-link" href={repository}>
           GitHub
         </a>
+        <LanguageLink copy={copy} href={otherLanguageHref} />
         <ThemeToggle copy={copy} />
       </div>
     </header>
   );
 }
 
+/** A globe that goes to the other language's page. Its name is that language written in itself ("English" on the Japanese page), so readers of either language can find it. */
+function LanguageLink({ copy, href }: { copy: Copy; href: string }) {
+  const other = copy.lang === "ja" ? "en" : "ja";
+  return (
+    <a className="icon-button" href={href} hrefLang={other} lang={other} aria-label={copy.otherLanguage} title={copy.otherLanguage}>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+        <circle cx="12" cy="12" r="9" />
+        <path d="M3 12h18" />
+        <path d="M12 3c2.5 2.5 3.8 5.5 3.8 9s-1.3 6.5-3.8 9c-2.5-2.5-3.8-5.5-3.8-9S9.5 5.5 12 3z" />
+      </svg>
+    </a>
+  );
+}
+
 /** Switches light and dark. It ships hidden; the script in Page.astro shows it and keeps aria-pressed (dark or not) in sync. */
 function ThemeToggle({ copy }: { copy: Copy }) {
   return (
-    <button type="button" className="theme-toggle" aria-label={copy.darkMode} aria-pressed="false" hidden>
+    <button type="button" className="icon-button theme-toggle" aria-label={copy.darkMode} aria-pressed="false" hidden>
       <svg className="moon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
         <path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z" />
       </svg>
