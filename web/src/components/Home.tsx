@@ -1,5 +1,4 @@
-import { ArrowDownTrayIcon, GlobeAltIcon, MoonIcon, SunIcon } from "@heroicons/react/16/solid";
-import { MarkGithubIcon } from "@primer/octicons-react";
+import { DownloadIcon, GlobeIcon, MarkGithubIcon, MoonIcon, SunIcon } from "@primer/octicons-react";
 import { Fragment } from "react";
 import type { Copy } from "../i18n";
 import { Logo } from "./Logo";
@@ -25,7 +24,7 @@ export function Home({ copy, otherLanguageHref }: { copy: Copy; otherLanguageHre
 
 const repository = "https://github.com/hrkmtsmt/wavi";
 
-/** Icon + "Wavi" on the left; the GitHub link, the language link and the light/dark toggle on the right, as 32px icon buttons. UI icons are Heroicons' 16px "micro" set, drawn for that size. */
+/** Icon + "Wavi" on the left; the GitHub link, the language link and the light/dark toggle on the right, as 32px icon buttons. Every UI icon is a 16px Octicon, GitHub's own set, so the GitHub mark and the rest match. */
 function Header({ copy, otherLanguageHref }: { copy: Copy; otherLanguageHref: string }) {
   return (
     <header className="header">
@@ -34,7 +33,7 @@ function Header({ copy, otherLanguageHref }: { copy: Copy; otherLanguageHref: st
         <span>Wavi</span>
       </a>
       <div className="header-end">
-        {/* GitHub's own mark from Octicons, in the page's ink, as GitHub's logo guidelines allow for a link to GitHub: https://brand.github.com/foundations/logo */}
+        {/* GitHub's mark, in the page's ink, as GitHub's logo guidelines allow for a link to GitHub: https://brand.github.com/foundations/logo */}
         <a className="icon-button" href={repository} aria-label="GitHub" title="GitHub">
           <MarkGithubIcon size={16} aria-hidden="true" />
         </a>
@@ -50,7 +49,7 @@ function LanguageLink({ copy, href }: { copy: Copy; href: string }) {
   const other = copy.lang === "ja" ? "en" : "ja";
   return (
     <a className="icon-button" href={href} hrefLang={other} lang={other} aria-label={copy.otherLanguage} title={copy.otherLanguage}>
-      <GlobeAltIcon width={16} height={16} />
+      <GlobeIcon size={16} aria-hidden="true" />
     </a>
   );
 }
@@ -59,8 +58,8 @@ function LanguageLink({ copy, href }: { copy: Copy; href: string }) {
 function ThemeToggle({ copy }: { copy: Copy }) {
   return (
     <button type="button" className="icon-button theme-toggle" aria-label={copy.darkMode} aria-pressed="false" hidden>
-      <MoonIcon className="moon" width={16} height={16} />
-      <SunIcon className="sun" width={16} height={16} />
+      <MoonIcon className="moon" size={16} aria-hidden="true" />
+      <SunIcon className="sun" size={16} aria-hidden="true" />
     </button>
   );
 }
@@ -81,7 +80,7 @@ function Hero({ copy }: { copy: Copy }) {
       </p>
       {/* Always the latest release's Wavi.zip; release.yml attaches it under this name every time. */}
       <a className="download" href={`${repository}/releases/latest/download/Wavi.zip`}>
-        <ArrowDownTrayIcon width={16} height={16} />
+        <DownloadIcon size={16} aria-hidden="true" />
         {copy.download}
       </a>
     </section>
