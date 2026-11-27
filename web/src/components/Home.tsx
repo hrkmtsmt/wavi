@@ -1,12 +1,14 @@
+import { DownloadIcon, GlobeIcon, MarkGithubIcon, MoonIcon, SunIcon } from "@primer/octicons-react";
 import { Fragment } from "react";
 import type { Copy } from "../i18n";
+import { Logo } from "./Logo";
 import { Showcase } from "./Showcase";
 
 /** The adopted design's "ホームページ（左寄せ）" and SPEC 8: these sections only, in this order. */
 export function Home({ copy, otherLanguageHref }: { copy: Copy; otherLanguageHref: string }) {
   return (
     <>
-      <Header />
+      <Header copy={copy} otherLanguageHref={otherLanguageHref} />
       <main>
         <Hero copy={copy} />
         {/* A still for now; SPEC 8 swaps it for a short screen recording of the real app later. */}
@@ -22,42 +24,43 @@ export function Home({ copy, otherLanguageHref }: { copy: Copy; otherLanguageHre
 
 const repository = "https://github.com/hrkmtsmt/wavi";
 
-/** Icon + "Wavi", and only a GitHub link on the right. */
-function Header() {
+/** Icon + "Wavi" on the left; the GitHub link, the language link and the light/dark toggle on the right, as 32px icon buttons. Every UI icon is a 16px Octicon, GitHub's own set, so the GitHub mark and the rest match. */
+function Header({ copy, otherLanguageHref }: { copy: Copy; otherLanguageHref: string }) {
   return (
     <header className="header">
       <a className="logo" href="#top">
-        <Logo />
+        <Logo size={32} />
         <span>Wavi</span>
       </a>
-      <a className="header-link" href={repository}>
-        GitHub
-      </a>
+      <div className="header-end">
+        {/* GitHub's mark, in the page's ink, as GitHub's logo guidelines allow for a link to GitHub: https://brand.github.com/foundations/logo */}
+        <a className="icon-button" href={repository} aria-label="GitHub" title="GitHub">
+          <MarkGithubIcon size={16} aria-hidden="true" />
+        </a>
+        <LanguageLink copy={copy} href={otherLanguageHref} />
+        <ThemeToggle copy={copy} />
+      </div>
     </header>
   );
 }
 
-function Logo() {
+/** A globe that goes to the other language's page. Its name is that language written in itself ("English" on the Japanese page), so readers of either language can find it. */
+function LanguageLink({ copy, href }: { copy: Copy; href: string }) {
+  const other = copy.lang === "ja" ? "en" : "ja";
   return (
-    <svg width="32" height="32" viewBox="0 0 100 100" aria-hidden="true">
-      <defs>
-        <linearGradient id="logo-bg" gradientUnits="userSpaceOnUse" x1="35" y1="10" x2="65" y2="90">
-          <stop offset="0" stopColor="#FFFFFF" />
-          <stop offset="1" stopColor="#E4E8ED" />
-        </linearGradient>
-        <linearGradient id="logo-body" x1="0" y1="1" x2="1" y2="0">
-          <stop offset="0" stopColor="#DCDFE3" />
-          <stop offset="1" stopColor="#ACB2BA" />
-        </linearGradient>
-      </defs>
-      <rect x="6" y="6" width="88" height="88" rx="20" fill="url(#logo-bg)" stroke="#000000" strokeOpacity="0.1" strokeWidth="1.2" />
-      <path
-        d="M24 74 V51 C24 42 28.5 37.5 34 37.5 C39.5 37.5 40.5 44 46 44 C51.5 44 52.5 35 59 35 C65.5 35 67.5 41.5 72 41.5 C75 41.5 76 45 76 51 V74 C76 76.8 73.8 79 71 79 H29 C26.2 79 24 76.8 24 74 Z"
-        fill="url(#logo-body)"
-      />
-      <circle cx="41" cy="58" r="4.4" fill="url(#logo-bg)" />
-      <circle cx="59" cy="58" r="4.4" fill="url(#logo-bg)" />
-    </svg>
+    <a className="icon-button" href={href} hrefLang={other} lang={other} aria-label={copy.otherLanguage} title={copy.otherLanguage}>
+      <GlobeIcon size={16} aria-hidden="true" />
+    </a>
+  );
+}
+
+/** Switches light and dark. It ships hidden; the script in Page.astro shows it and keeps aria-pressed (dark or not) in sync. */
+function ThemeToggle({ copy }: { copy: Copy }) {
+  return (
+    <button type="button" className="icon-button theme-toggle" aria-label={copy.darkMode} aria-pressed="false" hidden>
+      <MoonIcon className="moon" size={16} aria-hidden="true" />
+      <SunIcon className="sun" size={16} aria-hidden="true" />
+    </button>
   );
 }
 
@@ -77,11 +80,7 @@ function Hero({ copy }: { copy: Copy }) {
       </p>
       {/* Always the latest release's Wavi.zip; release.yml attaches it under this name every time. */}
       <a className="download" href={`${repository}/releases/latest/download/Wavi.zip`}>
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-          <path d="M12 4v11" />
-          <path d="M7.5 10.5L12 15l4.5-4.5" />
-          <path d="M5 19h14" />
-        </svg>
+        <DownloadIcon size={16} aria-hidden="true" />
         {copy.download}
       </a>
     </section>

@@ -11,6 +11,8 @@ interface Props {
 const { locale } = Astro.props;
 const text = copy[locale];
 const other = locales.find((l) => l !== locale) ?? locale;
+const url = getAbsoluteLocaleUrl(locale);
+const image = new URL("/og.png", Astro.site).href;
 ---
 
 <!doctype html>
@@ -23,9 +25,34 @@ const other = locales.find((l) => l !== locale) ?? locale;
     <meta name="description" content={text.description} />
     {
       locales.map((l) => (
-        <link rel="alternate" hreflang={l} href={Astro.site ? getAbsoluteLocaleUrl(l) : getRelativeLocaleUrl(l)} />
+        <link rel="alternate" hreflang={l} href={getAbsoluteLocaleUrl(l)} />
       ))
     }
+    <link rel="alternate" hreflang="x-default" href={getAbsoluteLocaleUrl("ja")} />
+    <link rel="canonical" href={url} />
+    <!-- favicon.ico for browsers that only look there, the SVG for the rest, and a PNG for iOS home screens. All are drawn from the Logo component (src/images.ts). -->
+    <link rel="icon" href="/favicon.ico" sizes="32x32" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Wavi" />
+    <meta property="og:title" content={text.title} />
+    <meta property="og:description" content={text.description} />
+    <meta property="og:url" content={url} />
+    <meta property="og:locale" content={text.ogLocale} />
+    <meta property="og:locale:alternate" content={copy[other].ogLocale} />
+    <meta property="og:image" content={image} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content={text.ogImageAlt} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <!-- Applies a light or dark choice saved by the header toggle before the page paints, so it never flashes the OS scheme first. -->
+    <script is:inline>
+      try {
+        const theme = localStorage.getItem("theme");
+        if (theme === "light" || theme === "dark") document.documentElement.dataset.theme = theme;
+      } catch {}
+    </script>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <!-- Gen Jyuu Gothic Monospace isn't served on the web, so M PLUS Rounded 1c stands in for Japanese in the mono stack (SPEC 4, 8). -->
@@ -36,5 +63,29 @@ const other = locales.find((l) => l !== locale) ?? locale;
   </head>
   <body>
     <Home copy={text} otherLanguageHref={getRelativeLocaleUrl(other)} />
+    <!-- The header toggle. Picking the scheme the OS already uses forgets the choice, so the page follows the OS again. -->
+    <script is:inline>
+      (() => {
+        const root = document.documentElement;
+        const button = document.querySelector(".theme-toggle");
+        const media = matchMedia("(prefers-color-scheme: dark)");
+        const isDark = () => (root.dataset.theme ?? (media.matches ? "dark" : "light")) === "dark";
+        const sync = () => button.setAttribute("aria-pressed", String(isDark()));
+        button.addEventListener("click", () => {
+          const next = isDark() ? "light" : "dark";
+          const followsOs = next === (media.matches ? "dark" : "light");
+          try {
+            if (followsOs) localStorage.removeItem("theme");
+            else localStorage.setItem("theme", next);
+          } catch {}
+          if (followsOs) delete root.dataset.theme;
+          else root.dataset.theme = next;
+          sync();
+        });
+        media.addEventListener("change", sync);
+        sync();
+        button.hidden = false;
+      })();
+    </script>
   </body>
 </html>

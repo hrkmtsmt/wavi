@@ -1,39 +1,31 @@
-/* Values come from the adopted design's "ホームページ（左寄せ）". Spacing uses the size tokens; the 1120px page width and the scaled drawing inside the showcase (cqw units) are the exceptions SPEC 8 allows. Dark mode follows the OS; its colors are the app's provisional dark values, since the design has no dark mode yet. The showcase is a picture of the app on its own dark backdrop, so it stays the same in both. */
+/* Values come from the adopted design's "ホームページ（左寄せ）". Spacing uses the size tokens; the 1120px page width and the scaled drawing inside the showcase (cqw units) are the exceptions SPEC 8 allows. Dark colors are the app's provisional dark values, since the design has no dark mode yet. The showcase is a picture of the app on its own dark backdrop, so it stays the same in both. */
+/* Light or dark follows the OS until the visitor picks one with the header toggle, which sets data-theme on <html>. Every color is a light-dark() pair, so switching only changes color-scheme. */
 :root {
-  --surface: #f6f6f7;
-  --paper: #ffffff;
-  --ink: #1c1c1e;
-  --ink-muted: #55555a;
-  --ink-subtle: #6b6b70;
-  --hairline: #e4e4e7;
-  --fill-track: rgba(60, 60, 67, 0.08);
-  --keys-text: #3a3a3c;
-  --keys-separator: #b0b0b5;
-  --keys-rim: #ffffff;
-  --button-background: linear-gradient(180deg, #3a3a3e 0%, #161618 60%, #08080a 100%);
-  --button-text: #ffffff;
-  --button-rim: rgba(255, 255, 255, 0.35);
+  color-scheme: light dark;
+  --surface: light-dark(#f6f6f7, #1c1c1e);
+  --paper: light-dark(#ffffff, #2c2c2e);
+  --ink: light-dark(#1c1c1e, #f2f2f4);
+  --ink-muted: light-dark(#55555a, #aeaeb2);
+  --ink-subtle: light-dark(#6b6b70, #8e8e93);
+  --hairline: light-dark(#e4e4e7, #3a3a3c);
+  --fill-track: light-dark(rgba(60, 60, 67, 0.08), rgba(255, 255, 255, 0.1));
+  --keys-text: light-dark(#3a3a3c, #d1d1d6);
+  --keys-separator: light-dark(#b0b0b5, #636366);
+  --keys-rim: light-dark(#ffffff, rgba(255, 255, 255, 0.08));
+  /* The ink button turns light in dark, so it stays the strongest thing on a dark page. */
+  --button-background: linear-gradient(180deg, light-dark(#3a3a3e, #ffffff) 0%, light-dark(#161618, #f2f2f4) 60%, light-dark(#08080a, #e4e4e7) 100%);
+  --button-text: light-dark(#ffffff, #1c1c1e);
+  --button-rim: light-dark(rgba(255, 255, 255, 0.35), rgba(255, 255, 255, 0.6));
   --mono: "JetBrains Mono", "GenJyuuGothic Monospace", "M PLUS Rounded 1c", monospace;
   --sans: "Noto Sans JP", system-ui, sans-serif;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --surface: #1c1c1e;
-    --paper: #2c2c2e;
-    --ink: #f2f2f4;
-    --ink-muted: #aeaeb2;
-    --ink-subtle: #8e8e93;
-    --hairline: #3a3a3c;
-    --fill-track: rgba(255, 255, 255, 0.1);
-    --keys-text: #d1d1d6;
-    --keys-separator: #636366;
-    --keys-rim: rgba(255, 255, 255, 0.08);
-    /* The ink button turns light, so it stays the strongest thing on a dark page. */
-    --button-background: linear-gradient(180deg, #ffffff 0%, #f2f2f4 60%, #e4e4e7 100%);
-    --button-text: #1c1c1e;
-    --button-rim: rgba(255, 255, 255, 0.6);
-  }
+:root[data-theme="light"] {
+  color-scheme: light;
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
 }
 
 body {
@@ -52,7 +44,7 @@ a:hover {
   color: var(--ink-muted);
 }
 
-/* Header: icon + "Wavi", and only a GitHub link on the right. */
+/* Header: icon + "Wavi" on the left; the GitHub link, the language link and the light/dark toggle on the right. */
 .header {
   max-width: 1120px;
   margin: 0 auto;
@@ -70,17 +62,51 @@ a:hover {
   gap: 8px;
   text-decoration: none;
   font-family: var(--mono);
-  font-size: 20px;
+  font-size: 16px;
   line-height: 32px;
   font-weight: 700;
 }
 
-.header-link {
-  font-family: var(--mono);
-  font-size: 16px;
-  line-height: 24px;
-  text-decoration: none;
+/* 8px between the icon buttons, on top of the 8px around each 16px icon. */
+.header-end {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* The 32px round buttons in the header: the GitHub link, the language link and the light/dark toggle. */
+.icon-button {
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: 9999px;
+  background: transparent;
   color: var(--ink-muted);
+  cursor: pointer;
+}
+
+/* Hidden in the HTML and shown by the script in Page.astro, so a page without JavaScript has no dead button. */
+.theme-toggle[hidden] {
+  display: none;
+}
+
+.icon-button:hover {
+  background: var(--fill-track);
+  color: var(--ink);
+}
+
+.icon-button:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}
+
+/* The moon offers dark while the page is light, and the sun offers light while it is dark. */
+.theme-toggle[aria-pressed="true"] .moon,
+.theme-toggle[aria-pressed="false"] .sun {
+  display: none;
 }
 
 /* Heading, description and the one download button, all on the left edge. */
